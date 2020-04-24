@@ -1,0 +1,65 @@
+<diagram program="umletino" version="14.3.0"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>330</x><y>510</y><w>220</w><h>180</h></coordinates><panel_attributes>PERFORMANCE_INDEX
+----------------------------------------------------------------
+- _tradelist_ : List[] : trade
+----------------------------------------------------------------
++calculate()
+----------------------------------------------------------------
+Notes:
+La classe rappresenta il un indice di 
+performance. Riceve una lista di trades
+e restituisce l'indice di performance.</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>140</x><y>180</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>230</y><w>220</w><h>180</h></coordinates><panel_attributes>TRADINGSYSTEM
+----------------------------------------------------------------
++id : int
++name: string
++symbol: string
++trade_list : List[]: trade
++indexes: *python_dict*
+----------------------------------------------------------------
+Notes:
+La classe rappresenta il trading system, 
+che va a comporre il portafogli.</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>140</x><y>400</y><w>30</w><h>130</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;110</additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>510</y><w>220</w><h>180</h></coordinates><panel_attributes>TRADE
+----------------------------------------------------------------
++id : int
++entry_time: string
++close_time: string
++net_profit: float
+----------------------------------------------------------------
+Notes:
+La classe rappresenta il un singolo
+scambio.</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>210</x><y>180</y><w>250</w><h>350</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;40;230;40;230;330</additional_attributes></element><element><id>Relation</id><coordinates><x>190</x><y>400</y><w>270</w><h>130</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;70;250;70;250;110</additional_attributes></element><element><id>UMLClass</id><coordinates><x>500</x><y>10</y><w>290</w><h>250</h></coordinates><panel_attributes>MAIN_WINDOW
+------------------------------------------------------------------------
++ p : Portfolio
+------------------------------------------------------------------------
++add_trading_system(csv_filepath)
++remove_trading_system(trading_system_id)
++load_portfolio(folder_path)
++clear_portfolio()
++show_details(trade_list)
++update()
+-------------------------------------------------------------------------
+Notes:
+La classe rappresenta la finestra
+principale, dove poter scegliere 
+cosa analizzare.</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>10</y><w>220</w><h>180</h></coordinates><panel_attributes>PORTFOLIO
+----------------------------------------------------------------
++trading_systems: List[]: tradingSystem
++indexes: *python_dict*
+----------------------------------------------------------------
++update_portfolio(idAction, id_ts)
+----------------------------------------------------------------
+Notes:
+La classe rappresenta la logica
+principale del software. Composta
+da "n" trading systems.</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>580</x><y>340</y><w>250</w><h>210</h></coordinates><panel_attributes>DETAIL_WINDOW
+------------------------------------------------------------------------
+_ trade_list _ : List[] :trade
++window_name : string
+- _tabList_ : List[] : TKinter_Tab
+------------------------------------------------------------------------
+- _ loadReport _()
+- _ loadDrawdownChart _()
+- _ loadEquityChart _()
+-------------------------------------------------------------------------
+Notes:
+La classe rappresenta la finestra
+dei dettagli e poter visionare le performance.</panel_attributes><additional_attributes></additional_attributes></element></diagram>
