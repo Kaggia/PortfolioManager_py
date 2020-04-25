@@ -108,3 +108,34 @@ class MainWindow:
         self.loadDetails_btn.setGeometry(QtCore.QRect(self.spacing_left +300, 400, 150, 31))
         self.font.setPointSize(22)
         self.loadDetails_btn.setText("Load details")
+class DetailWindow:
+    #load equity tab
+    def __init__(self):
+        self.frame = QtWidgets.QMainWindow()
+        self.frame.resize(720, 480)
+        self.frame.setWindowTitle("cTrader - Portfolio Manager - Detail window")
+        self.frame.setMinimumSize(QtCore.QSize(720, 480))
+        self.frame.setMaximumSize(QtCore.QSize(720, 480))
+        self.font = QtGui.QFont()
+        
+        # Initialize tab screen
+        self.tabs = QtWidgets.QTabWidget(self.frame)
+        self.tab_report = QtWidgets.QWidget()
+        self.tab_drawdown = QtWidgets.QWidget()
+        self.tab_equity = QtWidgets.QWidget()
+        self.tabs.resize(300,200)
+        # Add tabs
+        self.tabs.addTab(self.tab_report,"Tab Report")
+        self.tabs.addTab(self.tab_drawdown,"Tab Drawdown")
+        self.tabs.addTab(self.tab_equity,"Tab Equity")
+
+        self.frame.show()
+    #load equity tab
+    def __tab_report_loader__(self):
+        pass
+    #load equity tab
+    def __tab_drawdownChart_loader(self):
+        pass
+    #load equity tab
+    def __tab_equity_loader(self):
+        pass
