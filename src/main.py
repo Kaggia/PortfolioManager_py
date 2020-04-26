@@ -12,7 +12,7 @@ if __name__ == "__main__":
     
     app = QtWidgets.QApplication(sys.argv)
     #Create main window
-    #mw = MainWindow()
+    mw = MainWindow()
     #dw = DetailWindow()
     fm = FileManager()
     #SET_EXIT
