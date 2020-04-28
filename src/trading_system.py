@@ -10,9 +10,10 @@ class TradingSystem:
         self.symbol = None
         self.trade_list = None
         self.indexes = None 
-        self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Net €']
+        self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Close Time (UTC+1)', 'Net €']
         #Elaboration
         self.__load_data_from_csv__(ts_filepath)
+        self.print_trade_list()
     #scan a csv file, getting data from it
     def __load_data_from_csv__(self, filepath):
         if self.__check_file_integrity__(filepath):
