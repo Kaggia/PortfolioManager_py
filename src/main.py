@@ -8,9 +8,9 @@ import sys
 from graphics import MainWindow, DetailWindow
 from os_interactors import FileManager
 from trading_system import TradingSystem
+from portfolio import Portfolio
 
 if __name__ == "__main__":
-    
     app = QtWidgets.QApplication(sys.argv)
     #Create main window
     mw = MainWindow()

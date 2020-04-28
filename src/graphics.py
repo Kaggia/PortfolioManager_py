@@ -23,7 +23,7 @@ class MainWindow:
         #logo
         self.logoLabel = QtWidgets.QLabel(self.frame)
         self.logoLabel.setGeometry(QtCore.QRect(250, 10, 200, 175)) #(posX, posY, dimX, dimY)
-        self.logoLabel.setPixmap(QtGui.QPixmap(os.path.join(directory.RESOURCE_FOLDER, "logo_small.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(os.path.join(directory.RESOURCE_FOLDER, "logo.png")))
 
         self.frame.show()
     #Load menu bar: File|Options|Help
