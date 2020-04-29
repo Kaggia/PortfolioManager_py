@@ -10,11 +10,15 @@ class Portfolio:
         self.trading_systems = []
         self.indexes = None
         #Load Graphics
-    #add a system to portfolio NEED TO DEBUG
+    #add a system to portfolio
     def add_system(self, ts):
         new_ts = ts
         self.trading_systems.append(new_ts)
         print("INFO: Trading system " + str(ts.name) + " added to Portfolio")
     #remove a system to portfolio NEED TO IMPLEMET
     def remove_system(self, ts_id):
-        pass
+        self.trading_systems.pop(ts_id)
+        print("INFO: Trading system <" + str(ts_id) + "> has been removed.")
+    #Clear portfolio
+    def clear(self):
+        self.trading_systems = []

@@ -114,8 +114,9 @@ class MainWindow:
         self.loadDetails_btn.setText("Load details")
     #Attach event handlers to the graphical obj
     def __attach_handlers__(self):
-        #Add_system_button
         self.add_system_btn.clicked.connect(self.add_system_btn_Onclick)
+        self.remove_system_btn.clicked.connect(self.remove_system_btn_Onclick)
+        self.clear_portfolio_btn.clicked.connect(self.clear_portfolio_btn_Onclick)
     #ADD_SYSTEM_BUTTON_HANDLER
     def add_system_btn_Onclick(self):
         list_of_files = self.__file_manager__.get_files()
@@ -128,9 +129,24 @@ class MainWindow:
             complete_item_name = str(str(new_ts.id) + " : " + str(new_ts.name))
             self.remove_selected_item_cbox.addItem(complete_item_name)
             self.loadDetails_selected_item_cbox.addItem(complete_item_name)
-
+    #REMOVE_SYSTEM_BUTTON_HANDLER
+    def remove_system_btn_Onclick(self):
+        if len(self.current_portfolio.trading_systems)>1:
+            id_ts_to_remove = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
+            self.current_portfolio.remove_system(int(id_ts_to_remove)-1)
+            self.remove_selected_item_cbox.clear()
+            for ts in self.current_portfolio.trading_systems:
+                complete_item_name = str(str(ts.id) + " : " + str(ts.name))
+                self.remove_selected_item_cbox.addItem(complete_item_name)
+        else:
+            self.remove_selected_item_cbox.clear()
+    #CLEAR_PORTFOLIO_BUTTON_HANDLER
+    def clear_portfolio_btn_Onclick(self):
+        self.current_portfolio.clear()
+        self.remove_selected_item_cbox.clear()
+        self.loadDetails_selected_item_cbox.clear()
 class DetailWindow:
-    #load equity tab
+   #load equity tab
     def __init__(self):
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
