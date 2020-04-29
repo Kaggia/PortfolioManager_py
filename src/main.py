@@ -12,11 +12,9 @@ from portfolio import Portfolio
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+    #Create a portfolio NONE
+    p = Portfolio()
     #Create main window
-    mw = MainWindow()
-    #dw = DetailWindow()
-    fm = FileManager()
-    for selected_file in fm.get_files():
-        ts = TradingSystem(selected_file)
+    mw = MainWindow(p)
     #SET_EXIT
     sys.exit(app.exec_())

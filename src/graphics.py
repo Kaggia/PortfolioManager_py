@@ -5,9 +5,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 #My Modules
 import CONSTANTS as directory
+from os_interactors import FileManager
+from trading_system import TradingSystem
 
 class MainWindow:
-    def __init__(self):
+    def __init__(self, _portfolio):
+        self.current_portfolio = _portfolio
+        self.__file_manager__ = FileManager()
+        
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(1024, 720)
         self.frame.setWindowTitle("cTrader - Portfolio Manager")
@@ -20,6 +25,7 @@ class MainWindow:
         self.__load_loading_options__()
         self.__add_separator__()
         self.__load_selecting_system__()
+        self.__attach_handlers__()
         #logo
         self.logoLabel = QtWidgets.QLabel(self.frame)
         self.logoLabel.setGeometry(QtCore.QRect(250, 10, 200, 175)) #(posX, posY, dimX, dimY)
@@ -80,7 +86,6 @@ class MainWindow:
         #Combobox_REMOVE_SELECTED_ITEM
         self.remove_selected_item_cbox = QtWidgets.QComboBox(self.frame)
         self.remove_selected_item_cbox.setGeometry(QtCore.QRect(self.spacing_left + 150, y, 150, 31))
-        self.remove_selected_item_cbox.addItem("ITEM_SELECTED")
         #Button_CLEAR_PORTFOLIO
         y += 35
         self.clear_portfolio_btn = QtWidgets.QPushButton(self.frame)
@@ -102,12 +107,28 @@ class MainWindow:
         #SELECT_SYSTEM_CBOX
         self.loadDetails_selected_item_cbox = QtWidgets.QComboBox(self.frame)
         self.loadDetails_selected_item_cbox.setGeometry(QtCore.QRect(self.spacing_left + 150, 400, 150, 31))
-        self.loadDetails_selected_item_cbox.addItem("ITEM_SELECTED")
         #Button_LOAD_DETAILS
         self.loadDetails_btn = QtWidgets.QPushButton(self.frame)
         self.loadDetails_btn.setGeometry(QtCore.QRect(self.spacing_left +300, 400, 150, 31))
         self.font.setPointSize(22)
         self.loadDetails_btn.setText("Load details")
+    #Attach event handlers to the graphical obj
+    def __attach_handlers__(self):
+        #Add_system_button
+        self.add_system_btn.clicked.connect(self.add_system_btn_Onclick)
+    #ADD_SYSTEM_BUTTON_HANDLER
+    def add_system_btn_Onclick(self):
+        list_of_files = self.__file_manager__.get_files()
+        for selected_file in list_of_files:
+            #Add to portfolio
+            ts_id = len(self.current_portfolio.trading_systems) + 1
+            new_ts = TradingSystem(ts_id, selected_file)
+            self.current_portfolio.add_system(new_ts)
+            #add to combobox
+            complete_item_name = str(str(new_ts.id) + " : " + str(new_ts.name))
+            self.remove_selected_item_cbox.addItem(complete_item_name)
+            self.loadDetails_selected_item_cbox.addItem(complete_item_name)
+
 class DetailWindow:
     #load equity tab
     def __init__(self):

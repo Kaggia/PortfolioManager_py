@@ -3,9 +3,9 @@
 #Libraries
 import pandas as pd
 class TradingSystem:
-    def __init__(self, ts_filepath):
+    def __init__(self,_id, ts_filepath):
         #Attributes
-        self.id = None
+        self.id = _id
         self.name = None
         self.symbol = None
         self.trade_list = None
@@ -13,14 +13,10 @@ class TradingSystem:
         self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Close Time (UTC+1)', 'Net €']
         #Elaboration
         self.__load_data_from_csv__(ts_filepath)
-        self.print_trade_list()
     #scan a csv file, getting data from it
     def __load_data_from_csv__(self, filepath):
         if self.__check_file_integrity__(filepath):
             print("INFO: CSV is valid, ready to load.")
-            #Load_id
-            #Load_name
-            #Load_symbol
             #Load_TRADE_LIST
             row = []
             self.trade_list = []
@@ -32,6 +28,12 @@ class TradingSystem:
                 self.trade_list.append(row)
                 row = []
                 i += 1
+            #Load_name
+            if self.trade_list:
+                first_row = self.trade_list[0]
+                self.name = first_row[1]
+                #Load_symbol
+                self.symbol = first_row[2]
         else:
             print("ERROR: CSV is NOT valid, please select a VALID one.")
     #check integrity of a file CSV        

@@ -10,13 +10,11 @@ class Portfolio:
         self.trading_systems = []
         self.indexes = None
         #Load Graphics
-    #add a system to portfolio
-    def add_system(self, filepath):
-        fm = FileManager()
-        for path in fm.get_files():
-            ts = TradingSystem(path)
-            self.trading_systems.append(ts)
-            print("INFO: Trading system " + str(ts.name) + " added to Portfolio")
-    #remove a system to portfolio
+    #add a system to portfolio NEED TO DEBUG
+    def add_system(self, ts):
+        new_ts = ts
+        self.trading_systems.append(new_ts)
+        print("INFO: Trading system " + str(ts.name) + " added to Portfolio")
+    #remove a system to portfolio NEED TO IMPLEMET
     def remove_system(self, ts_id):
         pass
