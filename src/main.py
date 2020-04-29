@@ -18,3 +18,5 @@ if __name__ == "__main__":
     mw = MainWindow(p)
     #SET_EXIT
     sys.exit(app.exec_())
+
+

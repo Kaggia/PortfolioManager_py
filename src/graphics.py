@@ -21,16 +21,34 @@ class MainWindow:
         self.font = QtGui.QFont()
         self.spacing_left = 25
 
+        fontLogo = QtGui.QFont()
+        fontLogo.setPointSize(42)
+        self.logoLabel = QtWidgets.QLabel(self.frame)
+        self.logoLabel.setFont(fontLogo)
+        self.logoLabel.setText("PORTFOLIO MANAGER")
+        self.logoLabel.setGeometry(QtCore.QRect(75, 10, 600, 175)) #(posX, posY, dimX, dimY)
+        #self.logoLabel.setPixmap(QtGui.QPixmap('logo_small.jpeg'))
+        fontLogo_2 = QtGui.QFont()
+        fontLogo_2.setPointSize(12)
+        self.logoLabel_2 = QtWidgets.QLabel(self.frame)
+        self.logoLabel_2.setFont(fontLogo_2)
+        self.logoLabel_2.setText("for cTrader")
+        self.logoLabel_2.setGeometry(QtCore.QRect(550, 50, 125, 175)) #(posX, posY, dimX, dimY)
+        #self.logoLabel.setPixmap(QtGui.QPixmap('logo_small.jpeg'))
+        separator_font = QtGui.QFont()
+        separator_font.setPointSize(12)
+        self.separator = QtWidgets.QLabel(self.frame)
+        self.separator.setFont(separator_font)
+        self.separator.setText("__________________________________________________________")
+        self.separator.setGeometry(QtCore.QRect(90, 250, 800, 175)) #(posX, posY, dimX, dimY)
+
+
         self.__load_menu_bar__()
         self.__load_loading_options__()
         self.__add_separator__()
         self.__load_selecting_system__()
         self.__attach_handlers__()
-        #logo
-        self.logoLabel = QtWidgets.QLabel(self.frame)
-        self.logoLabel.setGeometry(QtCore.QRect(250, 10, 200, 175)) #(posX, posY, dimX, dimY)
-        self.logoLabel.setPixmap(QtGui.QPixmap(os.path.join(directory.RESOURCE_FOLDER, "logo.png")))
-
+        
         self.frame.show()
     #Load menu bar: File|Options|Help
     def __load_menu_bar__(self):
@@ -94,9 +112,7 @@ class MainWindow:
         self.clear_portfolio_btn.setText("Clear Portfolio")
     #Define a separator, based on png file
     def __add_separator__(self):
-        self.logoLabel = QtWidgets.QLabel(self.frame)
-        self.logoLabel.setGeometry(QtCore.QRect(100, 350, 500, 10)) #(posX, posY, dimX, dimY)
-        self.logoLabel.setPixmap(QtGui.QPixmap(os.path.join(directory.RESOURCE_FOLDER, "separator.png")))
+       pass
     #Load the sectione relative to the selection of a single or multiple systems
     def __load_selecting_system__(self):
         #LABEL
