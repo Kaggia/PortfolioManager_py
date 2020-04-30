@@ -40,7 +40,7 @@ class MainWindow:
         self.separator = QtWidgets.QLabel(self.frame)
         self.separator.setFont(separator_font)
         self.separator.setText("__________________________________________________________")
-        self.separator.setGeometry(QtCore.QRect(90, 250, 800, 175)) #(posX, posY, dimX, dimY)
+        self.separator.setGeometry(QtCore.QRect(90, 275, 800, 175)) #(posX, posY, dimX, dimY)
 
 
         self.__load_menu_bar__()
@@ -74,6 +74,14 @@ class MainWindow:
         self.actionExitApp = QtWidgets.QAction(self.frame)
         self.actionExitApp.setText("Exit")
         self.menuFile.addAction(self.actionExitApp)
+        #Actions_OPTION_add_system
+        self.addSystemOption = QtWidgets.QAction(self.frame)
+        self.addSystemOption.setText("Add system(s)")
+        self.menuOptions.addAction(self.addSystemOption)
+        #Actions_OPTION_clear_pf
+        self.clearPortfolio = QtWidgets.QAction(self.frame)
+        self.clearPortfolio.setText("Clear Portfolio")
+        self.menuOptions.addAction(self.clearPortfolio)
     #Load the section relative to loading options
     def __load_loading_options__(self):
         #Label_loading_opt
@@ -83,12 +91,6 @@ class MainWindow:
         self.font.setPointSize(22)
         self.load_option_label.setText("Load options:")
 
-        #Button_LOAD_NEW_PF
-        y += 25
-        self.load_new_portfolio_btn = QtWidgets.QPushButton(self.frame)
-        self.load_new_portfolio_btn.setGeometry(QtCore.QRect(self.spacing_left, y, 150, 31))
-        self.font.setPointSize(22)
-        self.load_new_portfolio_btn.setText("Load Portfolio(Folder)")
         #Button_ADD_SYSTEM
         y += 35
         self.add_system_btn = QtWidgets.QPushButton(self.frame)
@@ -133,6 +135,10 @@ class MainWindow:
         self.add_system_btn.clicked.connect(self.add_system_btn_Onclick)
         self.remove_system_btn.clicked.connect(self.remove_system_btn_Onclick)
         self.clear_portfolio_btn.clicked.connect(self.clear_portfolio_btn_Onclick)
+        #Action in menus
+        self.addSystemOption.triggered.connect(self.add_system_btn_Onclick)
+        self.clearPortfolio.triggered.connect(self.clear_portfolio_btn_Onclick)
+
     #ADD_SYSTEM_BUTTON_HANDLER
     def add_system_btn_Onclick(self):
         list_of_files = self.__file_manager__.get_files()
@@ -161,6 +167,7 @@ class MainWindow:
         self.current_portfolio.clear()
         self.remove_selected_item_cbox.clear()
         self.loadDetails_selected_item_cbox.clear()
+
 class DetailWindow:
    #load equity tab
     def __init__(self):
