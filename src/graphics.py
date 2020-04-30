@@ -136,9 +136,9 @@ class MainWindow:
         self.remove_system_btn.clicked.connect(self.remove_system_btn_Onclick)
         self.clear_portfolio_btn.clicked.connect(self.clear_portfolio_btn_Onclick)
         #Action in menus
+        self.actionExitApp.triggered.connect(self.close_window_Onclik)
         self.addSystemOption.triggered.connect(self.add_system_btn_Onclick)
         self.clearPortfolio.triggered.connect(self.clear_portfolio_btn_Onclick)
-
     #ADD_SYSTEM_BUTTON_HANDLER
     def add_system_btn_Onclick(self):
         list_of_files = self.__file_manager__.get_files()
@@ -167,7 +167,9 @@ class MainWindow:
         self.current_portfolio.clear()
         self.remove_selected_item_cbox.clear()
         self.loadDetails_selected_item_cbox.clear()
-
+    #close mainwindow
+    def close_window_Onclik(self):
+        self.frame.close()
 class DetailWindow:
    #load equity tab
     def __init__(self):
