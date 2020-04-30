@@ -2,6 +2,7 @@
 #Libreria grafica contenente gli oggetti dell'interfaccia
 #Libraries
 from PyQt5 import QtCore, QtGui, QtWidgets
+from operator import itemgetter
 import os
 #My Modules
 import CONSTANTS as directory
@@ -135,6 +136,7 @@ class MainWindow:
         self.add_system_btn.clicked.connect(self.add_system_btn_Onclick)
         self.remove_system_btn.clicked.connect(self.remove_system_btn_Onclick)
         self.clear_portfolio_btn.clicked.connect(self.clear_portfolio_btn_Onclick)
+        self.loadDetails_btn.clicked.connect(self.show_details)
         #Action in menus
         self.actionExitApp.triggered.connect(self.close_window_Onclik)
         self.addSystemOption.triggered.connect(self.add_system_btn_Onclick)
@@ -150,7 +152,11 @@ class MainWindow:
             #add to combobox
             complete_item_name = str(str(new_ts.id) + " : " + str(new_ts.name))
             self.remove_selected_item_cbox.addItem(complete_item_name)
-            self.loadDetails_selected_item_cbox.addItem(complete_item_name)
+            if (self.loadDetails_selected_item_cbox.currentText() == ""):
+                self.loadDetails_selected_item_cbox.addItem("0 : Portfolio")
+                self.loadDetails_selected_item_cbox.addItem(complete_item_name)
+            else:
+                self.loadDetails_selected_item_cbox.addItem(complete_item_name)
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
         if len(self.current_portfolio.trading_systems)>1:
@@ -170,9 +176,29 @@ class MainWindow:
     #close mainwindow
     def close_window_Onclik(self):
         self.frame.close()
+    #show detail window of selected ts or portfolio
+    def show_details(self):
+        ID_instr_to_load = self.loadDetails_selected_item_cbox.currentText()[:self.loadDetails_selected_item_cbox.currentText().find(' :')]
+        unordered_list_of_trades = []
+        if int(ID_instr_to_load) == 0:
+            #Load portfolio details
+            print("INFO: Portfolio with ID-> " + str(ID_instr_to_load) + " will be shown in details.")
+            for ts in self.current_portfolio.trading_systems:
+                for trade in ts.trade_list:
+                    unordered_list_of_trades.append(trade)
+            dw = DetailWindow(unordered_list_of_trades)
+        else:
+            #Load System by ID
+            print("INFO: System with ID-> " + str(ID_instr_to_load) + " will be shown in details.")
+            for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
+                    unordered_list_of_trades.append(trade)
+            dw = DetailWindow(unordered_list_of_trades)
 class DetailWindow:
    #load equity tab
-    def __init__(self):
+    def __init__(self, _unordered_list_of_trades):
+        self.trades = _unordered_list_of_trades
+        self.__order_raw_trade_list__()
+        
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
         self.frame.setWindowTitle("cTrader - Portfolio Manager - Detail window")
@@ -201,3 +227,13 @@ class DetailWindow:
     #load equity tab
     def __tab_equity_loader(self):
         pass
+    #order tradelist passed
+    def __order_raw_trade_list__(self):
+        #itemgetter_0->ID
+        #itemgetter_1->Label
+        #etc...
+        ordered_list = sorted(self.trades, key=itemgetter(0))
+        self.trades = ordered_list
+        for trade in self.trades:
+            print(trade)
+        
