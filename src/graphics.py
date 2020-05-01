@@ -264,3 +264,9 @@ class ScrolligGridArea():
         self.scroll.setWidget(self.parent)
 
         self.parent.setCentralWidget(self.parent)
+    #add a new index specifying <index_name> and his <value>
+    def add_new_index(self, _index_name, _index_value):
+        pass
+    #add a new line of text like it was a couple <index_name> and his <value>
+    def add_text(self, _text_to_show):
+        pass
