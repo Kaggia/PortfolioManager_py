@@ -241,4 +241,10 @@ class DetailWindow:
         self.trades = ordered_list
         for trade in self.trades:
             print(trade)
-        
+class WidgetLayoutManager():
+    def __init__(self, _widget, _columns, _rows):
+        self.columns = _columns
+        self.rows = _rows  
+
+        self.parent = _widget
+        self.ScrollArea = QtWidgets.QScrollArea(self.parent)
