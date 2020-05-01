@@ -13,6 +13,7 @@ class MainWindow:
     def __init__(self, _portfolio):
         self.current_portfolio = _portfolio
         self.__file_manager__ = FileManager()
+        self.__secondary_windows__ = []
         
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(1024, 720)
@@ -186,13 +187,13 @@ class MainWindow:
             for ts in self.current_portfolio.trading_systems:
                 for trade in ts.trade_list:
                     unordered_list_of_trades.append(trade)
-            dw = DetailWindow(unordered_list_of_trades)
+            self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
         else:
             #Load System by ID
             print("INFO: System with ID-> " + str(ID_instr_to_load) + " will be shown in details.")
             for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
                     unordered_list_of_trades.append(trade)
-            dw = DetailWindow(unordered_list_of_trades)
+            self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
 class DetailWindow:
    #load equity tab
     def __init__(self, _unordered_list_of_trades):
@@ -211,11 +212,15 @@ class DetailWindow:
         self.tab_report = QtWidgets.QWidget()
         self.tab_drawdown = QtWidgets.QWidget()
         self.tab_equity = QtWidgets.QWidget()
-        self.tabs.resize(300,200)
+        self.tabs.resize(500,400)
         # Add tabs
         self.tabs.addTab(self.tab_report,"Tab Report")
         self.tabs.addTab(self.tab_drawdown,"Tab Drawdown")
         self.tabs.addTab(self.tab_equity,"Tab Equity")
+        #Load Tabs content
+        self.__tab_report_loader__()
+        self.__tab_equity_loader()
+        self.__tab_drawdownChart_loader()
 
         self.frame.show()
     #load equity tab
