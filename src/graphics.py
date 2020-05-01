@@ -225,7 +225,9 @@ class DetailWindow:
         self.frame.show()
     #load equity tab
     def __tab_report_loader__(self):
-        pass
+        #Instanciate a scrolling area with <n, m> grid
+        scrolling_grid_area = ScrolligGridArea(self.tab_report, 2, 5, 50, 25)
+
     #load equity tab
     def __tab_drawdownChart_loader(self):
         pass
@@ -241,10 +243,24 @@ class DetailWindow:
         self.trades = ordered_list
         for trade in self.trades:
             print(trade)
-class WidgetLayoutManager():
-    def __init__(self, _widget, _columns, _rows):
-        self.columns = _columns
+class ScrolligGridArea():
+    def __init__(self, _widget, _columns, _rows, _spacingX, _spacingY):
+        self.columns = _columns #Colonnee intese come coppia <Label, label>
         self.rows = _rows  
+        self.height = _widget.height()
+        self.width = _widget.width()
+        self.positioning_cursor = {"X": 0, "Y": 0}
+        self.spacing = {"X": _spacingX, "Y": _spacingY}
 
         self.parent = _widget
-        self.ScrollArea = QtWidgets.QScrollArea(self.parent)
+        self.scroll = QtWidgets.QScrollArea(self.parent)
+        self.vbox = QtWidgets.QVBoxLayout()
+        self.parent.setLayout(self.vbox)
+
+        #Scroll Area Properties
+        self.scroll.setVerticalScrollBarPolicy(QtCore.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(QtCore.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.parent)
+
+        self.parent.setCentralWidget(self.parent)
