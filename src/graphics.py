@@ -8,7 +8,7 @@ import os
 import CONSTANTS as directory
 from os_interactors import FileManager
 from trading_system import TradingSystem
-
+#Main window where you can manage the whole portfolio
 class MainWindow:
     def __init__(self, _portfolio):
         self.current_portfolio = _portfolio
@@ -194,6 +194,7 @@ class MainWindow:
             for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
                     unordered_list_of_trades.append(trade)
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
+#Window where various details are shown
 class DetailWindow:
    #load equity tab
     def __init__(self, _unordered_list_of_trades):
@@ -243,6 +244,7 @@ class DetailWindow:
         self.trades = ordered_list
         for trade in self.trades:
             print(trade)
+#Describe an area where indexes can be added, row by row
 class ScrolligGridArea():
     def __init__(self, _widget, _columns, _rows, _spacingX, _spacingY):
         self.columns = _columns #Colonnee intese come coppia <Label, label>
@@ -266,7 +268,38 @@ class ScrolligGridArea():
         self.parent.setCentralWidget(self.parent)
     #add a new index specifying <index_name> and his <value>
     def add_new_index(self, _index_name, _index_value):
-        pass
+        #positioning in a new line
+        self.positioning_cursor["Y"] += self.spacing["Y"]
+        #index_text
+        index_text_label = QtWidgets.QLabel()
+        index_text_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"], 
+                                                        self.positioning_cursor["Y"], 
+                                                         150, 
+                                                          30)
+                                            )
+        index_text_label.setText(_index_name)
+        #index_value
+        index_value_label = QtWidgets.QLabel()
+        index_value_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"] + self.spacing["X"], 
+                                                        self.positioning_cursor["Y"], 
+                                                         150, 
+                                                          30)
+                                            )
+        index_value_label.setText(_index_value)
+        #add to layout
+        self.vbox.addWidget(index_text_label)
+        self.vbox.addWidget(index_value_label)
     #add a new line of text like it was a couple <index_name> and his <value>
     def add_text(self, _text_to_show):
-        pass
+        #positioning in a new line
+        self.positioning_cursor["Y"] += self.spacing["Y"]
+        #index_text
+        text_label = QtWidgets.QLabel()
+        text_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"], 
+                                                        self.positioning_cursor["Y"], 
+                                                         150, 
+                                                          30)
+                                            )
+        text_label.setText(_text_to_show)
+        #add to layout
+        self.vbox.addWidget(text_label)
