@@ -210,7 +210,7 @@ class DetailWindow:
         
         # Initialize tab screen
         self.tabs = QtWidgets.QTabWidget(self.frame)
-        self.tab_report = QtWidgets.QWidget()
+        self.tab_report = ReportTab(2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
         self.tab_drawdown = QtWidgets.QWidget()
         self.tab_equity = QtWidgets.QWidget()
         self.tabs.resize(500,400)
@@ -226,8 +226,8 @@ class DetailWindow:
         self.frame.show()
     #load equity tab
     def __tab_report_loader__(self):
-        #Instanciate a scrolling area with <n, m> grid
-        scrolling_grid_area = ScrolligGridArea(self.tab_report, 2, 5, 50, 25)
+        self.tab_report.add_text("Sistema")
+        self.tab_report.add_new_index("Index prova", 250)
 
     #load equity tab
     def __tab_drawdownChart_loader(self):
@@ -244,62 +244,57 @@ class DetailWindow:
         self.trades = ordered_list
         for trade in self.trades:
             print(trade)
-#Describe an area where indexes can be added, row by row
-class ScrolligGridArea():
-    def __init__(self, _widget, _columns, _rows, _spacingX, _spacingY):
-        self.columns = _columns #Colonnee intese come coppia <Label, label>
+
+class ReportTab(QtWidgets.QTabWidget):
+    def __init__(self,_columns, _rows, _spacingX, _spacingY):
+        #Calling super <Tab>
+        super().__init__()
+        #<self> variable refers to the <Tab>
         self.rows = _rows  
-        self.height = _widget.height()
-        self.width = _widget.width()
-        self.positioning_cursor = {"X": 0, "Y": 0}
-        self.spacing = {"X": _spacingX, "Y": _spacingY}
-
-        self.parent = _widget
-        self.scroll = QtWidgets.QScrollArea(self.parent)
-        self.vbox = QtWidgets.QVBoxLayout()
-        self.parent.setLayout(self.vbox)
-
-        #Scroll Area Properties
-        self.scroll.setVerticalScrollBarPolicy(QtCore.ScrollBarAlwaysOn)
-        self.scroll.setHorizontalScrollBarPolicy(QtCore.ScrollBarAlwaysOff)
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setWidget(self.parent)
-
-        self.parent.setCentralWidget(self.parent)
+        self.grid_counting = {"X": 0, "Y": 0}
+        self.column_distancing = self.width() / (_columns * 2)
+        self.positioning_cursor = {"X": 10, "Y": -20} #Posizione del cursore per il posizionamento
+        self.spacing = {"X": _spacingX, "Y": _spacingY} #Spazio tra gli elementi
     #add a new index specifying <index_name> and his <value>
     def add_new_index(self, _index_name, _index_value):
         #positioning in a new line
         self.positioning_cursor["Y"] += self.spacing["Y"]
         #index_text
-        index_text_label = QtWidgets.QLabel()
-        index_text_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"], 
+        index_text_label = QtWidgets.QLabel(self)
+        index_text_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"] + (self.column_distancing * self.grid_counting["Y"]), 
                                                         self.positioning_cursor["Y"], 
                                                          150, 
                                                           30)
                                             )
         index_text_label.setText(_index_name)
         #index_value
-        index_value_label = QtWidgets.QLabel()
-        index_value_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"] + self.spacing["X"], 
+        index_value_label = QtWidgets.QLabel(self)
+        index_value_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"] + self.spacing["X"] + (self.column_distancing * self.grid_counting["Y"]), 
                                                         self.positioning_cursor["Y"], 
                                                          150, 
                                                           30)
                                             )
-        index_value_label.setText(_index_value)
-        #add to layout
-        self.vbox.addWidget(index_text_label)
-        self.vbox.addWidget(index_value_label)
-    #add a new line of text like it was a couple <index_name> and his <value>
+        index_value_label.setText(str(_index_value))
+        self.__grid_counting__()
+    #add a simple text
     def add_text(self, _text_to_show):
         #positioning in a new line
         self.positioning_cursor["Y"] += self.spacing["Y"]
         #index_text
-        text_label = QtWidgets.QLabel()
-        text_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"], 
+        text_label = QtWidgets.QLabel(self)
+        text_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"] + (self.column_distancing * self.grid_counting["Y"]), 
                                                         self.positioning_cursor["Y"], 
                                                          150, 
                                                           30)
                                             )
         text_label.setText(_text_to_show)
-        #add to layout
-        self.vbox.addWidget(text_label)
+        self.__grid_counting__()
+    #when you add a row, manage the colums
+    def __grid_counting__(self):
+        self.grid_counting["X"] += 1
+        if self.grid_counting["X"] > self.rows :
+            #si è superato il limite di righe
+            self.grid_counting["X"] = 0
+            self.grid_counting["Y"] += 1
+            #Reset cursor for Y
+            self.positioning_cursor["Y"] = -20
