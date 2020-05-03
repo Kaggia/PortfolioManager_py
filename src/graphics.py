@@ -8,6 +8,8 @@ import os
 import CONSTANTS as directory
 from os_interactors import FileManager
 from trading_system import TradingSystem
+from indexes import Name, FormattedSymbol
+
 #Main window where you can manage the whole portfolio
 class MainWindow:
     def __init__(self, _portfolio):
@@ -226,9 +228,10 @@ class DetailWindow:
         self.frame.show()
     #load equity tab
     def __tab_report_loader__(self):
-        self.tab_report.add_text("Sistema")
+        name_of_ts = Name(self.trades)
+        symbol_of_ts = FormattedSymbol(self.trades)
+        self.tab_report.add_text(name_of_ts.calculate() + symbol_of_ts.calculate())
         self.tab_report.add_new_index("Index prova", 250)
-
     #load equity tab
     def __tab_drawdownChart_loader(self):
         pass
@@ -242,9 +245,7 @@ class DetailWindow:
         #etc...
         ordered_list = sorted(self.trades, key=itemgetter(0))
         self.trades = ordered_list
-        for trade in self.trades:
-            print(trade)
-
+#Instanciate and manage the report tab, printing all indexes
 class ReportTab(QtWidgets.QTabWidget):
     def __init__(self,_columns, _rows, _spacingX, _spacingY):
         #Calling super <Tab>
