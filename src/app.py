@@ -240,11 +240,38 @@ class DetailWindow:
         pass
     #order tradelist passed
     def __order_raw_trade_list__(self):
-        #itemgetter_0->ID
-        #itemgetter_1->Label
-        #etc...
-        ordered_list = sorted(self.trades, key=itemgetter(0))
+        i = 0
+        index_of_date = 0
+        #Get the ID of column with dates_format
+        for trade in self.trades:
+            for column in trade:
+                if len(str(column)) == 16:
+                    if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
+                        #Column found is a valid date
+                        index_of_date = i 
+                        internal_date = self.__convert_date_to_internalDate__(column[0:2], column[3:5], column[6:11], column[11:13], column[14:])
+                        trade.append(internal_date)
+                        break  
+                i +=1    
+            i = 0
+            index_of_date = 0
+                
+        #For every trade add a column with value, derived from date format
+        ordered_list = sorted(self.trades, key=itemgetter(-1))
         self.trades = ordered_list
+        for trade in self.trades:
+            print(trade)
+    #convert a date(string) to a internalDate Value, letting the list be ordered
+    def __convert_date_to_internalDate__(self, _day, _month, _year, _hour, _minute):
+        day_value = (int(_day) - 1 ) * 1440
+        month_value = (int(_month) - 1 ) * 43800
+        year_value = (int(_year) - 2000 ) * 524160
+        hour_value = int(_hour) * 60
+        minute_value = int(_minute)
+        sum_of_minutes = day_value + month_value + year_value + hour_value + minute_value
+
+        return sum_of_minutes
+
 #Instanciate and manage the report tab, printing all indexes
 class ReportTab(QtWidgets.QTabWidget):
     def __init__(self,_columns, _rows, _spacingX, _spacingY):

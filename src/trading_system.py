@@ -12,6 +12,7 @@ class TradingSystem:
         self.indexes = None 
         self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Close Time (UTC+1)', 'Net €']
         #Elaboration
+        self.__clear_columns_name__(ts_filepath)
         self.__load_data_from_csv__(ts_filepath)
     #scan a csv file, getting data from it
     def __load_data_from_csv__(self, filepath):
@@ -51,6 +52,24 @@ class TradingSystem:
                 print("ERROR: Column <" + column_to_check + "> is not a valid column") 
                 break       
         return integrity
+    #clear the first line (colum_names), cause some of them are inconsistent
+    def __clear_columns_name__(self, ts_filepath):
+        #CLEAR dates(UTC+n) part
+        with open(ts_filepath) as f:
+            lines = f.readlines()
+        #Find (UTC+) part, and subs it
+        first_line = lines[0]
+        first_line_first_part = first_line[:first_line.find("(UTC+")-1]
+        first_line_second_part = first_line[first_line.find("(UTC+") + 7:]
+        good_line = first_line_first_part + first_line_second_part
+        first_line = good_line
+        first_line_first_part = first_line[:first_line.find("(UTC+")-1]
+        first_line_second_part = first_line[first_line.find("(UTC+") + 7:]
+        good_line = first_line_first_part + first_line_second_part
+        lines[0] = good_line
+        with open(ts_filepath, "w") as f:
+            f.writelines(lines)
+
     #Print trades on console
     def print_trade_list(self):
         for row in self.trade_list:

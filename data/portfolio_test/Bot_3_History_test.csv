@@ -1,4 +1,4 @@
-﻿ID,Label,Entry Time (UTC+2),Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time (UTC+2),Net €,Gross €
+﻿Closing Deal ID,Label,Entry Time (UTC+2),Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time (UTC+2),Net €,Gross €
 1,TSFY_GENPLUS_AUDCAD_H1,25/10/2007 06:00,AUDCAD,AUD 50k,Buy,0.87294,0,0.87378,25/10/2007 07:00,28.56,28.56
 2,TSFY_GENPLUS_AUDCAD_H1,31/10/2007 04:00,AUDCAD,AUD 50k,Buy,0.87866,0,0.88228,31/10/2007 07:00,123.08,123.08
 3,TSFY_GENPLUS_AUDCAD_H1,08/11/2007 03:00,AUDCAD,AUD 50k,Buy,0.85913,0,0.8595,08/11/2007 07:00,12.58,12.58

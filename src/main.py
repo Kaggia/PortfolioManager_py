@@ -5,7 +5,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 #My Modules
-from graphics import MainWindow, DetailWindow
+from app import MainWindow, DetailWindow
 from os_interactors import FileManager
 from trading_system import TradingSystem
 from portfolio import Portfolio

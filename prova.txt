@@ -1,0 +1,1 @@
+﻿Closing Deal ID,Label,Entry Time,Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time,Net €,Gross €
