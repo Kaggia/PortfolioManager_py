@@ -4,6 +4,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from operator import itemgetter
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 #My Modules
 import CONSTANTS as directory
 from os_interactors import FileManager
@@ -214,8 +218,8 @@ class DetailWindow:
         self.tabs = QtWidgets.QTabWidget(self.frame)
         self.tab_report = ReportTab(2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
         self.tab_drawdown = QtWidgets.QWidget()
-        self.tab_equity = QtWidgets.QWidget()
-        self.tabs.resize(500,400)
+        self.tab_equity = EquityChartTab()
+        self.tabs.resize(720,480)
         # Add tabs
         self.tabs.addTab(self.tab_report,"Tab Report")
         self.tabs.addTab(self.tab_drawdown,"Tab Drawdown")
@@ -328,3 +332,21 @@ class ReportTab(QtWidgets.QTabWidget):
             self.grid_counting["Y"] += 1
             #Reset cursor for Y
             self.positioning_cursor["Y"] = -20
+#Instanciate and manage the report tab, printing equity line
+class EquityChartTab(QtWidgets.QTabWidget):
+    def __init__(self):
+        #Calling super <Tab>
+        super().__init__()
+        sc = MplCanvas(self, width=10, height=6, dpi=75, _yLabel="Equity", _xLabel="Trades")
+        sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
+        sc.setParent(self)
+#Canvas class to manage a chart
+class MplCanvas(FigureCanvasQTAgg):
+    def __init__(self, parent=None, width=5, height=4, dpi=100, _yLabel="", _xLabel=""):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        self.axes.set_ylabel(_yLabel)
+        self.axes.set_xlabel(_xLabel)
+        super(MplCanvas, self).__init__(fig)
+
+ 

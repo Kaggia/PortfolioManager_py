@@ -1,4 +1,4 @@
-﻿Closing Deal ID,Label,Entry Time (UTC+1),Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time (UTC+1),Net €,Gross €
+Closing Deal ID,Label,Entry Time,Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time,Net,Gross
 1,XSp500 Gen_Plus D1,31/01/2007 23:04,US500,100 Indices,Buy,1312.4,0,1307.5,12/02/2007 23:01,-426.72,-426.72
 2,XSp500 Gen_Plus D1,13/02/2007 23:00,US500,100 Indices,Buy,1318.8,0,1266.5,27/02/2007 23:00,-4605.96,-4605.96
 3,XSp500 Gen_Plus D1,28/02/2007 23:00,US500,100 Indices,Sell,1271.5,0,1257.5,01/03/2007 09:33,1231.78,1231.78
