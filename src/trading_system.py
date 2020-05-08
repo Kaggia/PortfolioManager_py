@@ -10,8 +10,9 @@ class TradingSystem:
         self.symbol = None
         self.trade_list = None
         self.indexes = None 
-        self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Close Time (UTC+1)', 'Net €']
+        self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Close Time', 'Net']
         #Elaboration
+        self.__clear_columns_name__(ts_filepath)
         self.__clear_columns_name__(ts_filepath)
         self.__load_data_from_csv__(ts_filepath)
     #scan a csv file, getting data from it
@@ -21,7 +22,7 @@ class TradingSystem:
             #Load_TRADE_LIST
             row = []
             self.trade_list = []
-            pd_dataframe = pd.read_csv(filepath)
+            pd_dataframe = pd.read_csv(filepath, encoding='latin-1')
             i = 0        
             for _ in range(len(pd_dataframe)):
                 for column in self.__colums_checkList__:
@@ -40,7 +41,7 @@ class TradingSystem:
     #check integrity of a file CSV        
     def __check_file_integrity__(self, ts_filepath):
         print("INFO: Reading CSV in -> " + str(ts_filepath))
-        pd_dataframe = pd.read_csv(ts_filepath)
+        pd_dataframe = pd.read_csv(ts_filepath, encoding='latin-1')
         pd_columns = pd_dataframe.columns
         integrity = True
         for column_to_check in self.__colums_checkList__:
@@ -57,19 +58,11 @@ class TradingSystem:
         #CLEAR dates(UTC+n) part
         with open(ts_filepath) as f:
             lines = f.readlines()
-        #Find (UTC+) part, and subs it
-        first_line = lines[0]
-        first_line_first_part = first_line[:first_line.find("(UTC+")-1]
-        first_line_second_part = first_line[first_line.find("(UTC+") + 7:]
-        good_line = first_line_first_part + first_line_second_part
-        first_line = good_line
-        first_line_first_part = first_line[:first_line.find("(UTC+")-1]
-        first_line_second_part = first_line[first_line.find("(UTC+") + 7:]
-        good_line = first_line_first_part + first_line_second_part
-        lines[0] = good_line
+        
+        lines[0] = "Closing Deal ID,Label,Entry Time,Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time,Net,Gross\n"
+
         with open(ts_filepath, "w") as f:
             f.writelines(lines)
-
     #Print trades on console
     def print_trade_list(self):
         for row in self.trade_list:

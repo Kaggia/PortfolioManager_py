@@ -1,4 +1,4 @@
-Closing Deal ID,Label,Entry Time,Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time,Net,Gross
+﻿Closing Deal ID,Label,Entry Time (UTC-6),Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time (UTC-6),Net €,Gross �sing Deal ID,Label,Entry Time (UTC-6),Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time (UTC-6),Net €,Gross �sing Deal ID,Label,Entry Time (UTC-6),Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time (UTC-6),Net €,Gross �sing Deal ID,Label,Entry Time (UTC-6),Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time (UTC-6),Net €,Gross €
 1,AUD_JPY_10K,02/01/2007 19:01,AUDJPY,AUD 10k,Buy,118.79,-0.38,118.79,02/01/2007 20:00,-0.38,0
 2,AUD_JPY_10K,03/01/2007 19:01,AUDJPY,AUD 10k,Buy,119.34,-0.38,119.31,03/01/2007 21:00,-2.72,-2.34
 3,AUD_JPY_10K,04/01/2007 18:01,AUDJPY,AUD 10k,Sell,118.31,-0.38,118.74,05/01/2007 05:00,-33.86,-33.48

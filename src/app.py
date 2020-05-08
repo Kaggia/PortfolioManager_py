@@ -259,8 +259,11 @@ class DetailWindow:
         #For every trade add a column with value, derived from date format
         ordered_list = sorted(self.trades, key=itemgetter(-1))
         self.trades = ordered_list
+        #re-assign progressive ids
+        trade_id = 0
         for trade in self.trades:
-            print(trade)
+            trade[0] = trade_id
+            trade_id += 1
     #convert a date(string) to a internalDate Value, letting the list be ordered
     def __convert_date_to_internalDate__(self, _day, _month, _year, _hour, _minute):
         day_value = (int(_day) - 1 ) * 1440
@@ -271,7 +274,6 @@ class DetailWindow:
         sum_of_minutes = day_value + month_value + year_value + hour_value + minute_value
 
         return sum_of_minutes
-
 #Instanciate and manage the report tab, printing all indexes
 class ReportTab(QtWidgets.QTabWidget):
     def __init__(self,_columns, _rows, _spacingX, _spacingY):

@@ -1,4 +1,4 @@
-Closing Deal ID,Label,Entry Time,Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time,Net,Gross
+﻿ID,Label,Entry Time (UTC+2),Symbol,Volume,Type,Entry Price,Commissions,Close Price,Close Time (UTC+2),Net €,Gross €
 1,TSFY_GENPLUS_AUDCHF_H1,26/07/2007 18:00,AUDCHF,AUD 50k,Sell,1.0588,0,1.0572,26/07/2007 19:01,70.5,70.5
 2,TSFY_GENPLUS_AUDCHF_H1,03/08/2007 13:00,AUDCHF,AUD 50k,Sell,1.0324,0,1.0165,05/08/2007 23:01,700.61,700.61
 3,TSFY_GENPLUS_AUDCHF_H1,14/08/2007 17:00,AUDCHF,AUD 50k,Sell,1.0122,0,1.0136,14/08/2007 18:00,-61.69,-61.69
