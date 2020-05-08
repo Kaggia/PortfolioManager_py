@@ -218,7 +218,7 @@ class DetailWindow:
         self.tabs = QtWidgets.QTabWidget(self.frame)
         self.tab_report = ReportTab(2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
         self.tab_drawdown = QtWidgets.QWidget()
-        self.tab_equity = EquityChartTab()
+        self.tab_equity = EquityChartTab(self.trades)
         self.tabs.resize(720,480)
         # Add tabs
         self.tabs.addTab(self.tab_report,"Tab Report")
@@ -334,11 +334,21 @@ class ReportTab(QtWidgets.QTabWidget):
             self.positioning_cursor["Y"] = -20
 #Instanciate and manage the report tab, printing equity line
 class EquityChartTab(QtWidgets.QTabWidget):
-    def __init__(self):
+    def __init__(self, _trade_list):
         #Calling super <Tab>
         super().__init__()
+        #Load x and y axes value
+        x_list_of_values = []
+        equity_progressive = 0
+        y_list_of_values = []
+        for trade in _trade_list:
+            equity_progressive = equity_progressive + trade[-2]
+            x_list_of_values.append(trade[0])
+            y_list_of_values.append(equity_progressive)
+        print("INFO: Operations made: " + str(x_list_of_values[-1]))
+        print("INFO: Equity cumulative: " + str(equity_progressive))
         sc = MplCanvas(self, width=10, height=6, dpi=75, _yLabel="Equity", _xLabel="Trades")
-        sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
+        sc.axes.plot(x_list_of_values, y_list_of_values) #xList, ylist
         sc.setParent(self)
 #Canvas class to manage a chart
 class MplCanvas(FigureCanvasQTAgg):
