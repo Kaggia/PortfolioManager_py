@@ -158,3 +158,31 @@ class EvenTrades(CustomIndex):
             if trade[-2] == 0:
                 t_even_of_trades += 1
         return t_even_of_trades
+#Average profit per trade
+class AvgTradeNetProfit(CustomIndex):
+    def calculate(self):
+        #NetProfit/TotalNumberOfTrades
+        eq = Equity(self.__trade_list__)
+        eq_value = eq.calculate()
+        tnot = TotalNumberOfTrades(self.__trade_list__)
+        tnot_value = tnot.calculate()
+
+        return round(eq_value/tnot_value, 2)
+#Average profit per winning trade
+class AvgWinningTrade(CustomIndex):
+    def calculate(self):
+        gp = GrossProfit(self.__trade_list__)
+        gp_value = gp.calculate()
+        wt = WinningTrades(self.__trade_list__)
+        wt_value = wt.calculate()
+
+        return round(gp_value/wt_value, 2)
+#Average profit per losing trade
+class AvgLosingTrade(CustomIndex):
+    def calculate(self):
+        gl = GrossLoss(self.__trade_list__)
+        gl_value = gl.calculate()
+        lt = LosingTrades(self.__trade_list__)
+        lt_value =lt.calculate()
+
+        return round(gl_value/lt_value, 2)

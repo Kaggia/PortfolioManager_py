@@ -12,7 +12,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import CONSTANTS as directory
 from os_interactors import FileManager
 from trading_system import TradingSystem
-from indexes import Name, FormattedSymbol, Symbol, Equity, MaximumDrawdown, Drawdown, GrossProfit, GrossLoss, ProfitFactor, TotalNumberOfTrades, WinningTrades, LosingTrades, EvenTrades
+from indexes import *
 
 #Main window where you can manage the whole portfolio
 class MainWindow:
@@ -231,6 +231,8 @@ class DetailWindow:
         self.frame.show()
     #load report tab
     def __tab_report_loader__(self):
+        _ = CustomIndex(self.trades)
+        _ = Symbol(self.trades)
         name_of_ts = Name(self.trades)
         symbol_of_ts = FormattedSymbol(self.trades)
         equity = Equity(self.trades)
@@ -242,6 +244,10 @@ class DetailWindow:
         winning_trades = WinningTrades(self.trades)
         losing_trades = LosingTrades(self.trades)
         even_trades = EvenTrades(self.trades)
+        avg_trade_net_profit = AvgTradeNetProfit(self.trades)
+        avg_winning_trade = AvgWinningTrade(self.trades)
+        avg_losing_trade = AvgLosingTrade(self.trades)
+
         self.tab_report.add_text(name_of_ts.calculate() + symbol_of_ts.calculate())
         self.tab_report.add_new_index("Net Profit: ", equity.calculate())
         self.tab_report.add_new_index("Drawdown(max): ", max_dd.calculate())
@@ -254,6 +260,9 @@ class DetailWindow:
         self.tab_report.add_new_index("Winning trades: ", winning_trades.calculate())
         self.tab_report.add_new_index("Losing trades: ", losing_trades.calculate())
         self.tab_report.add_new_index("Even trades: ", even_trades.calculate())
+        self.tab_report.add_new_index("Average profit per trade: ", avg_trade_net_profit.calculate())
+        self.tab_report.add_new_index("Average Winning trade: ", avg_winning_trade.calculate())
+        self.tab_report.add_new_index("Average Losing trade: ", avg_losing_trade.calculate())
 
 
     #load dd tab
