@@ -100,3 +100,61 @@ class Drawdown(CustomIndex):
                 cumulative_lose = 0
                 
         return y_values
+#Calculate Gross Profit
+class GrossProfit(CustomIndex):
+    def calculate(self):
+        gross_profit = 0
+        for trade in self.__trade_list__:
+            if trade[-2] > 0:
+                gross_profit = gross_profit + trade[-2]
+        return round(gross_profit, 2)
+#Calculate Gross Loss
+class GrossLoss(CustomIndex):
+    def calculate(self):
+        gross_loss = 0
+        for trade in self.__trade_list__:
+            if trade[-2] < 0:
+                gross_loss = gross_loss + trade[-2]
+        return round(gross_loss, 2)
+#Calculate Profit factor
+class ProfitFactor(CustomIndex):
+    def calculate(self):
+        gp = GrossProfit(self.__trade_list__)
+        gp_value = gp.calculate()
+        gl = GrossLoss(self.__trade_list__)
+        gl_value = gl.calculate() * -1
+        print(gp_value)
+        print(gl_value)
+
+        return round(gp_value / gl_value, 2)
+#Count number of trades
+class TotalNumberOfTrades(CustomIndex):
+    def calculate(self):
+        t_num_of_trades = 0
+        for _ in self.__trade_list__:
+            t_num_of_trades += 1
+        return t_num_of_trades
+#Count number of winning trades
+class WinningTrades(CustomIndex):
+    def calculate(self):
+        t_win_of_trades = 0
+        for trade in self.__trade_list__:
+            if trade[-2] > 0:
+                t_win_of_trades += 1
+        return t_win_of_trades
+#Count number of losing trades
+class LosingTrades(CustomIndex):
+    def calculate(self):
+        t_los_of_trades = 0
+        for trade in self.__trade_list__:
+            if trade[-2] < 0:
+                t_los_of_trades += 1
+        return t_los_of_trades
+#Count number of even trades
+class EvenTrades(CustomIndex):
+    def calculate(self):
+        t_even_of_trades = 0
+        for trade in self.__trade_list__:
+            if trade[-2] == 0:
+                t_even_of_trades += 1
+        return t_even_of_trades

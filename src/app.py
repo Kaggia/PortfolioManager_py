@@ -12,7 +12,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import CONSTANTS as directory
 from os_interactors import FileManager
 from trading_system import TradingSystem
-from indexes import Name, FormattedSymbol, Symbol, Equity, MaximumDrawdown, Drawdown
+from indexes import Name, FormattedSymbol, Symbol, Equity, MaximumDrawdown, Drawdown, GrossProfit, GrossLoss, ProfitFactor, TotalNumberOfTrades, WinningTrades, LosingTrades, EvenTrades
 
 #Main window where you can manage the whole portfolio
 class MainWindow:
@@ -235,9 +235,27 @@ class DetailWindow:
         symbol_of_ts = FormattedSymbol(self.trades)
         equity = Equity(self.trades)
         max_dd = MaximumDrawdown(self.trades)
+        gross_profit = GrossProfit(self.trades)
+        gross_loss = GrossLoss(self.trades)
+        profit_factor = ProfitFactor(self.trades)
+        total_trades = TotalNumberOfTrades(self.trades)
+        winning_trades = WinningTrades(self.trades)
+        losing_trades = LosingTrades(self.trades)
+        even_trades = EvenTrades(self.trades)
         self.tab_report.add_text(name_of_ts.calculate() + symbol_of_ts.calculate())
-        self.tab_report.add_new_index("Equity(final): ", equity.calculate())
+        self.tab_report.add_new_index("Net Profit: ", equity.calculate())
         self.tab_report.add_new_index("Drawdown(max): ", max_dd.calculate())
+        self.tab_report.add_new_index("Gross Profit: ", gross_profit.calculate())
+        self.tab_report.add_new_index("Gross Loss: ", gross_loss.calculate())
+        self.tab_report.add_new_index("Profit Factor: ", profit_factor.calculate())
+        self.tab_report.add_text("")
+        self.tab_report.add_text("Trades info")
+        self.tab_report.add_new_index("Total trades: ", total_trades.calculate())
+        self.tab_report.add_new_index("Winning trades: ", winning_trades.calculate())
+        self.tab_report.add_new_index("Losing trades: ", losing_trades.calculate())
+        self.tab_report.add_new_index("Even trades: ", even_trades.calculate())
+
+
     #load dd tab
     def __tab_drawdownChart_loader(self):
         pass
