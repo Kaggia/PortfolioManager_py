@@ -12,7 +12,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import CONSTANTS as directory
 from os_interactors import FileManager
 from trading_system import TradingSystem
-from indexes import *
+from indexes import Name, FormattedSymbol, Symbol, Equity, MaximumDrawdown, Drawdown
 
 #Main window where you can manage the whole portfolio
 class MainWindow:
@@ -246,21 +246,16 @@ class DetailWindow:
         pass
     #order tradelist passed
     def __order_raw_trade_list__(self):
-        i = 0
-        index_of_date = 0
+        #index_of_date = 0
         #Get the ID of column with dates_format
         for trade in self.trades:
             for column in trade:
                 if len(str(column)) == 16:
                     if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
-                        #Column found is a valid date
-                        index_of_date = i 
+                        #Column found is a valid date 
                         internal_date = self.__convert_date_to_internalDate__(column[0:2], column[3:5], column[6:11], column[11:13], column[14:])
                         trade.append(internal_date)
                         break  
-                i +=1    
-            i = 0
-            index_of_date = 0
                 
         #For every trade add a column with value, derived from date format
         ordered_list = sorted(self.trades, key=itemgetter(-1))
