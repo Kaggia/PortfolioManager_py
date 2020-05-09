@@ -12,7 +12,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import CONSTANTS as directory
 from os_interactors import FileManager
 from trading_system import TradingSystem
-from indexes import Name, FormattedSymbol
+from indexes import *
 
 #Main window where you can manage the whole portfolio
 class MainWindow:
@@ -217,7 +217,7 @@ class DetailWindow:
         # Initialize tab screen
         self.tabs = QtWidgets.QTabWidget(self.frame)
         self.tab_report = ReportTab(2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
-        self.tab_drawdown = QtWidgets.QWidget()
+        self.tab_drawdown = DrawdownChartTab(self.trades)
         self.tab_equity = EquityChartTab(self.trades)
         self.tabs.resize(720,480)
         # Add tabs
@@ -345,10 +345,20 @@ class EquityChartTab(QtWidgets.QTabWidget):
             equity_progressive = equity_progressive + trade[-2]
             x_list_of_values.append(trade[0])
             y_list_of_values.append(equity_progressive)
-        print("INFO: Operations made: " + str(x_list_of_values[-1]))
-        print("INFO: Equity cumulative: " + str(equity_progressive))
         sc = MplCanvas(self, width=10, height=6, dpi=75, _yLabel="Equity", _xLabel="Trades")
         sc.axes.plot(x_list_of_values, y_list_of_values) #xList, ylist
+        sc.setParent(self)
+#Instanciate and manage the drawdown tab, printing drawdown bars
+class DrawdownChartTab(QtWidgets.QTabWidget):
+    def __init__(self, _trade_list):
+        #Calling super <Tab>
+        super().__init__()
+        #Calculates Local Drawdowns
+        dd = Drawdown(_trade_list)
+        y_list_of_values = dd.calculate()
+        x_list_of_values = [ index for index in range(len(y_list_of_values))]
+        sc = MplCanvas(self, width=10, height=6, dpi=75, _yLabel="Drawdown", _xLabel="Index")
+        sc.axes.bar(x_list_of_values, y_list_of_values, color='r') #xList, ylist
         sc.setParent(self)
 #Canvas class to manage a chart
 class MplCanvas(FigureCanvasQTAgg):

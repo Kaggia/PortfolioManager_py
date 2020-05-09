@@ -9,12 +9,6 @@ class CustomIndex():
     #calculate and return the index
     def calculate(self):
         pass
-#Calculate the equity (final) <NOT_IMPLEMENTED>
-class Equity(CustomIndex):
-    #calculate and return the index
-    def calculate(self):
-        value = 0
-        return value
 #Extract name of Trading system or set to Portfolio
 class Name(CustomIndex):
     #calculate and return the index
@@ -61,4 +55,29 @@ class Symbol(CustomIndex):
             tl_first = tl[0]
             value = tl_first[2] #prende il nome del ts     
         return value
-        
+#Calculate the equity (final) <NOT_IMPLEMENTED>
+class Equity(CustomIndex):
+    #calculate and return the index
+    def calculate(self):
+        value = 0
+        return value
+#Calculate Drawdown, returning a list of values
+class Drawdown(CustomIndex):
+    #calculate and return the index
+    def calculate(self):
+        dd_values = []
+        y_values = []
+        cumulative_lose = 0
+        for trade in self.__trade_list__:
+            current_net = trade[-2]
+            if current_net < 0:
+                dd_values.append(current_net)
+            else:
+                if dd_values :
+                    for value in dd_values:
+                        cumulative_lose = cumulative_lose + value
+                    y_values.append(cumulative_lose)
+                    dd_values = []
+                cumulative_lose = 0
+                
+        return y_values
