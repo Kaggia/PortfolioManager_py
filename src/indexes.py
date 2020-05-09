@@ -55,12 +55,31 @@ class Symbol(CustomIndex):
             tl_first = tl[0]
             value = tl_first[2] #prende il nome del ts     
         return value
-#Calculate the equity (final) <NOT_IMPLEMENTED>
+#Calculate the equity (final)
 class Equity(CustomIndex):
     #calculate and return the index
     def calculate(self):
-        value = 0
-        return value
+        equity = 0
+        for trade in self.__trade_list__:
+            equity = equity + trade[-2]
+        return round(equity, 2)
+#Calculate maximum drawdown
+class MaximumDrawdown (CustomIndex):
+    #calculate and return the index
+    def calculate(self):
+        max_dd = 0
+        max_equity = 0
+        min_equity = 0
+        equity = 0
+        for trade in self.__trade_list__:
+            equity = equity + trade[-2]
+            if equity > max_equity:
+                max_equity = equity
+            elif equity < max_equity:
+                min_equity = equity
+                if (max_equity - min_equity) > max_dd:
+                    max_dd = max_equity - min_equity
+        return round(max_dd * -1, 2)
 #Calculate Drawdown, returning a list of values
 class Drawdown(CustomIndex):
     #calculate and return the index

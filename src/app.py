@@ -202,7 +202,6 @@ class MainWindow:
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
 #Window where various details are shown
 class DetailWindow:
-   #load equity tab
     def __init__(self, _unordered_list_of_trades):
         self.trades = _unordered_list_of_trades
         self.__order_raw_trade_list__()
@@ -230,13 +229,16 @@ class DetailWindow:
         self.__tab_drawdownChart_loader()
 
         self.frame.show()
-    #load equity tab
+    #load report tab
     def __tab_report_loader__(self):
         name_of_ts = Name(self.trades)
         symbol_of_ts = FormattedSymbol(self.trades)
+        equity = Equity(self.trades)
+        max_dd = MaximumDrawdown(self.trades)
         self.tab_report.add_text(name_of_ts.calculate() + symbol_of_ts.calculate())
-        self.tab_report.add_new_index("Index prova", 250)
-    #load equity tab
+        self.tab_report.add_new_index("Equity(final): ", equity.calculate())
+        self.tab_report.add_new_index("Drawdown(max): ", max_dd.calculate())
+    #load dd tab
     def __tab_drawdownChart_loader(self):
         pass
     #load equity tab
