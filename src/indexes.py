@@ -124,7 +124,10 @@ class ProfitFactor(CustomIndex):
         gl = GrossLoss(self.__trade_list__)
         gl_value = gl.calculate() * -1
 
-        return round(gp_value / gl_value, 2)
+        if gp_value > 0 and gl_value > 0: 
+            return round(gp_value / gl_value, 2)
+        else:
+            return 0
 #Count number of trades
 class TotalNumberOfTrades(CustomIndex):
     def calculate(self):
@@ -190,4 +193,8 @@ class AvgLosingTrade(CustomIndex):
         lt = LosingTrades(self.__trade_list__)
         lt_value =lt.calculate()
 
-        return round(gl_value/lt_value, 2)
+        if gl_value > 0 and lt_value > 0:
+            return round(gl_value/lt_value, 2)
+        else:
+            return 0
+        
