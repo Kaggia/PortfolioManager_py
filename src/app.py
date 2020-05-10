@@ -20,6 +20,7 @@ class MainWindow:
         self.current_portfolio = _portfolio
         self.__file_manager__ = FileManager()
         self.__secondary_windows__ = []
+        self.isFirstLoad = True
         
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(1024, 720)
@@ -185,6 +186,13 @@ class MainWindow:
         self.frame.close()
     #show detail window of selected ts or portfolio
     def show_details(self):
+        if self.isFirstLoad == False:
+            print("INFO: This is a second load, last columns of trades will be deleted.")
+            for ts in self.current_portfolio.trading_systems:
+                for trade in ts.trade_list:
+                    trade.pop(-1)
+            
+        self.isFirstLoad = False
         ID_instr_to_load = self.loadDetails_selected_item_cbox.currentText()[:self.loadDetails_selected_item_cbox.currentText().find(' :')]
         unordered_list_of_trades = []
         if int(ID_instr_to_load) == 0:
@@ -193,18 +201,24 @@ class MainWindow:
             for ts in self.current_portfolio.trading_systems:
                 for trade in ts.trade_list:
                     unordered_list_of_trades.append(trade)
+
+                
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
         else:
             #Load System by ID
             print("INFO: System with ID-> " + str(ID_instr_to_load) + " will be shown in details.")
             for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
                     unordered_list_of_trades.append(trade)
-            self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
+                
+            self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades)) 
 #Window where various details are shown
 class DetailWindow:
     def __init__(self, _unordered_list_of_trades):
         self.trades = _unordered_list_of_trades
         self.__order_raw_trade_list__()
+
+        #for trade in self.trades:
+        #    print(trade)
         
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
