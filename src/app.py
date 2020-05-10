@@ -243,6 +243,7 @@ class DetailWindow:
         total_trades = TotalNumberOfTrades(self.trades)
         winning_trades = WinningTrades(self.trades)
         losing_trades = LosingTrades(self.trades)
+        percent_profitable = PercentProfitable(self.trades)
         even_trades = EvenTrades(self.trades)
         avg_trade_net_profit = AvgTradeNetProfit(self.trades)
         avg_winning_trade = AvgWinningTrade(self.trades)
@@ -259,12 +260,11 @@ class DetailWindow:
         self.tab_report.add_new_index("Total trades: ", total_trades.calculate())
         self.tab_report.add_new_index("Winning trades: ", winning_trades.calculate())
         self.tab_report.add_new_index("Losing trades: ", losing_trades.calculate())
+        self.tab_report.add_new_index("Percent profitable: ", str(percent_profitable.calculate()) + " %")
         self.tab_report.add_new_index("Even trades: ", even_trades.calculate())
-        self.tab_report.add_new_index("Average profit per trade: ", avg_trade_net_profit.calculate())
-        self.tab_report.add_new_index("Average Winning trade: ", avg_winning_trade.calculate())
-        self.tab_report.add_new_index("Average Losing trade: ", avg_losing_trade.calculate())
-
-
+        self.tab_report.add_new_index("Avg profit per trade: ", avg_trade_net_profit.calculate())
+        self.tab_report.add_new_index("Avg Winning trade: ", avg_winning_trade.calculate())
+        self.tab_report.add_new_index("Avg Losing trade: ", avg_losing_trade.calculate())
     #load dd tab
     def __tab_drawdownChart_loader(self):
         pass

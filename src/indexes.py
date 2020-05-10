@@ -123,8 +123,6 @@ class ProfitFactor(CustomIndex):
         gp_value = gp.calculate()
         gl = GrossLoss(self.__trade_list__)
         gl_value = gl.calculate() * -1
-        print(gp_value)
-        print(gl_value)
 
         return round(gp_value / gl_value, 2)
 #Count number of trades
@@ -150,6 +148,13 @@ class LosingTrades(CustomIndex):
             if trade[-2] < 0:
                 t_los_of_trades += 1
         return t_los_of_trades
+#Count Winning/TotalNumberOFtrades*100
+class PercentProfitable(CustomIndex):
+    def calculate(self):
+        t_n_of_t = TotalNumberOfTrades(self.__trade_list__)
+        wt = WinningTrades(self.__trade_list__)
+
+        return round(wt.calculate() / t_n_of_t.calculate() * 100, 2)
 #Count number of even trades
 class EvenTrades(CustomIndex):
     def calculate(self):
