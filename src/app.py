@@ -262,6 +262,11 @@ class DetailWindow:
         avg_trade_net_profit = AvgTradeNetProfit(self.trades)
         avg_winning_trade = AvgWinningTrade(self.trades)
         avg_losing_trade = AvgLosingTrade(self.trades)
+        largest_win_trade = LargestWinningTrade(self.trades)
+        largest_los_trade = LargestLosingTrade(self.trades)
+        max_win_streak = MaxWinningStreak(self.trades)
+        max_los_streak = MaxLosingStreak(self.trades)
+        size_require = SizeRequirement(self.trades)
 
         self.tab_report.add_text(name_of_ts.calculate() + symbol_of_ts.calculate())
         self.tab_report.add_new_index("Net Profit: ", equity.calculate())
@@ -279,6 +284,12 @@ class DetailWindow:
         self.tab_report.add_new_index("Avg profit per trade: ", avg_trade_net_profit.calculate())
         self.tab_report.add_new_index("Avg Winning trade: ", avg_winning_trade.calculate())
         self.tab_report.add_new_index("Avg Losing trade: ", avg_losing_trade.calculate())
+        self.tab_report.add_new_index("Largest winning: ", largest_win_trade.calculate())
+        self.tab_report.add_new_index("Largest losing: ", largest_los_trade.calculate())
+        self.tab_report.add_text("")
+        self.tab_report.add_new_index("Max Win streak: ", max_win_streak.calculate())
+        self.tab_report.add_new_index("Max Lose streak: ", max_los_streak.calculate())
+        self.tab_report.add_new_index("Size required: ", size_require.calculate())
     #load dd tab
     def __tab_drawdownChart_loader(self):
         pass

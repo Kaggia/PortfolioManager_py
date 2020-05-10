@@ -197,4 +197,51 @@ class AvgLosingTrade(CustomIndex):
             return round(gl_value/lt_value, 2)
         else:
             return 0
+#Return larget winning trade
+class LargestWinningTrade(CustomIndex):
+    def calculate(self):
+        lt = 0
+        for trade in self.__trade_list__:
+            if trade[-2] > lt :
+                lt = trade[-2]
+        return lt  
+#Return larget losing trade
+class LargestLosingTrade(CustomIndex):
+    def calculate(self):
+        lt = 0
+        for trade in self.__trade_list__:
+            if trade[-2] < lt :
+                lt = trade[-2]
+        return lt  
+#Calculate max consecutive winning trades
+class MaxWinningStreak(CustomIndex):
+    def calculate(self):
+        mws = 0
+        current_ws = 0
+        for trade in self.__trade_list__:
+            if trade[-2] > 0 :
+                current_ws += 1
+            else:
+                if current_ws > mws:
+                    mws = current_ws
+                current_ws = 0
+        return mws  
+#Calculate max consecutive losing trades
+class MaxLosingStreak(CustomIndex):
+    def calculate(self):
+        mls = 0
+        current_ls = 0
+        for trade in self.__trade_list__:
+            if trade[-2] < 0 :
+                current_ls += 1
+            else:
+                if current_ls > mls:
+                    mls = current_ls
+                current_ls = 0
+        return mls  
+#Calculate Size required
+class SizeRequirement(CustomIndex):
+    def calculate(self):
+        md = MaximumDrawdown(self.__trade_list__)
         
+        return round(-2 * md.calculate(), 2)
