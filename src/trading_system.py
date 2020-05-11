@@ -14,7 +14,7 @@ class TradingSystem:
         #Elaboration
         self.__clear_columns_name__(ts_filepath)
         self.__clear_columns_name__(ts_filepath)
-        self.__load_data_from_csv__(ts_filepath)
+        self.__load_data_from_csv__(ts_filepath)     
     #scan a csv file, getting data from it
     def __load_data_from_csv__(self, filepath):
         if self.__check_file_integrity__(filepath):
@@ -36,6 +36,10 @@ class TradingSystem:
                 self.name = first_row[1]
                 #Load_symbol
                 self.symbol = first_row[2]
+            #Convertion date from <IT> to <ENG> format
+            if self.__detect_date_format__() == 0:
+                #Date format is NOT English
+                self.__date_convertion__()
         else:
             print("ERROR: CSV is NOT valid, please select a VALID one.")
     #check integrity of a file CSV        
@@ -63,6 +67,46 @@ class TradingSystem:
 
         with open(ts_filepath, "w") as f:
             f.writelines(lines)
+    #detect what format of date is
+    def __detect_date_format__(self):
+        date_format = 1 #English
+        for trade in self.trade_list:
+            for column in trade:
+                if len(str(column)) == 16:
+                    if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
+                        should_month = int(column[0:2])
+                        if should_month > 12 :
+                            date_format = 0
+                            print("INFO: Date format detected is <IT>. It will be changed to <ENG>")
+                            return date_format
+        print("INFO: Date format detected is <ENG>")
+        return date_format
+    #convert date format
+    def __date_convertion__(self):
+        converted_trade_list = []
+        trade = []
+        for trade in self.trade_list:
+            trade = []
+            for column in trade:
+                if str(column) == 16:
+                    if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
+                        swap = ""
+                        should_month = column[0:2]
+                        should_day = column[3:5]
+                        swap = should_month
+                        should_month = should_day
+                        should_day = swap
+                        year = column[6:11]
+                        hour = column[11:13]
+                        minutes = column[14:]
+                        correct_date = should_month + "/" + should_day + "/" + year + " " + hour + ":" + minutes
+                        trade.append(correct_date)
+                    else:
+                        trade.append(column)
+                else:
+                    trade.append(column)
+            converted_trade_list.append(trade)
+        self.trade_list = converted_trade_list
     #Print trades on console
     def print_trade_list(self):
         for row in self.trade_list:
