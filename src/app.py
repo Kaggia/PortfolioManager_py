@@ -213,12 +213,12 @@ class MainWindow:
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades)) 
 #Window where various details are shown
 class DetailWindow:
-    def __init__(self, _unordered_list_of_trades):
+    def __init__(self, _unordered_list_of_trades, _timeFilter='01/01/2000 00:00'):
         self.trades = _unordered_list_of_trades
         self.__order_raw_trade_list__()
-
-        #for trade in self.trades:
-        #    print(trade)
+        self.trades = self.__select_data_from__(_timeFilter)
+        for trade in self.trades:
+            print(trade)
         
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
@@ -317,6 +317,16 @@ class DetailWindow:
         for trade in self.trades:
             trade[0] = trade_id
             trade_id += 1
+    #selects data from the date specifiend on
+    def __select_data_from__(self, _timeFilter):
+        internal_date = self.__convert_date_to_internalDate__(_timeFilter[0:2], _timeFilter[3:5], _timeFilter[6:11], _timeFilter[11:13], _timeFilter[14:])
+        selected_trades_to_show = []
+        for trade in self.trades:
+            if trade[-1] >= internal_date:
+                selected_trades_to_show.append(trade)
+
+        return selected_trades_to_show
+    
     #convert a date(string) to a internalDate Value, letting the list be ordered
     def __convert_date_to_internalDate__(self, _day, _month, _year, _hour, _minute):
         day_value = (int(_day) - 1 ) * 1440
