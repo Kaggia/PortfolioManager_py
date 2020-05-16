@@ -57,6 +57,8 @@ class MainWindow:
         self.__load_selecting_system__()
         self.__attach_handlers__()
         
+        self.__load_summary_trading_system__() #Need to be removed, when finished
+
         self.frame.show()
     #Load menu bar: File|Options|Help
     def __load_menu_bar__(self):
@@ -135,6 +137,51 @@ class MainWindow:
         self.loadDetails_btn.setGeometry(QtCore.QRect(self.spacing_left +300, 400, 150, 31))
         self.font.setPointSize(22)
         self.loadDetails_btn.setText("Load details")
+    #Load summary of selected TS
+    def __load_summary_trading_system__(self):
+        font = QtGui.QFont()
+        self.groupBox_ts = QtWidgets.QGroupBox(self.frame)
+        self.groupBox_ts.setGeometry(QtCore.QRect(500, 175, 150, 100))
+        gridLayout = QtWidgets.QGridLayout()
+
+        self.summary_text_label_0 = QtWidgets.QLabel(self.frame)
+        self.summary_text_label_0.setGeometry(QtCore.QRect(500, 175, 150, 31))
+        font.setPointSize(22)
+        self.summary_text_label_0.setText("")
+
+        self.summary_text_label_1 = QtWidgets.QLabel(self.frame)
+        self.summary_text_label_1.setGeometry(QtCore.QRect(500, 175, 150, 31))
+        font.setPointSize(22)
+        self.summary_text_label_1.setText("Summary")
+
+        self.summary_text_label_2 = QtWidgets.QLabel(self.frame)
+        self.summary_text_label_2.setGeometry(QtCore.QRect(500, 175, 150, 31))
+        font.setPointSize(22)
+        self.summary_text_label_2.setText("")
+
+        self.summary_name_label = QtWidgets.QLabel(self.frame)
+        self.summary_name_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+        font.setPointSize(22)
+        self.summary_name_label.setText("Name: ")
+
+        self.summary_symbol_label = QtWidgets.QLabel(self.frame)
+        self.summary_symbol_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+        font.setPointSize(22)
+        self.summary_symbol_label.setText("Symbol: ")
+
+        self.summary_qnt_label = QtWidgets.QLabel(self.frame)
+        self.summary_qnt_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+        font.setPointSize(22)
+        self.summary_qnt_label.setText("Quantity: ")
+
+        gridLayout.addWidget(self.summary_text_label_0, 0, 0)
+        gridLayout.addWidget(self.summary_text_label_1, 0, 1)
+        gridLayout.addWidget(self.summary_text_label_2, 0, 2)
+        gridLayout.addWidget(self.summary_name_label, 1, 0)
+        gridLayout.addWidget(self.summary_symbol_label, 2, 0)
+        gridLayout.addWidget(self.summary_qnt_label, 3, 0)
+
+        self.groupBox_ts.setLayout(gridLayout)
     #Attach event handlers to the graphical obj
     def __attach_handlers__(self):
         self.add_system_btn.clicked.connect(self.add_system_btn_Onclick)
@@ -214,9 +261,6 @@ class DetailWindow:
         
         self.__order_raw_trade_list__()
         self.trades = self.__select_data_from__(_timeFilter)
-        
-        for trade in self.trades:
-            print(trade)
 
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
