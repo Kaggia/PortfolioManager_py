@@ -2,6 +2,7 @@
 #Define the structure of a Trading system
 #Libraries
 import pandas as pd
+from os_interactors import FileManager
 class TradingSystem:
     def __init__(self,_id, ts_filepath):
         #Attributes
@@ -14,7 +15,7 @@ class TradingSystem:
         #Elaboration
         self.__clear_columns_name__(ts_filepath)
         self.__clear_columns_name__(ts_filepath)
-        self.__load_data_from_csv__(ts_filepath)     
+        self.__load_data_from_csv__(ts_filepath) 
     #scan a csv file, getting data from it
     def __load_data_from_csv__(self, filepath):
         if self.__check_file_integrity__(filepath):
@@ -86,9 +87,9 @@ class TradingSystem:
         converted_trade_list = []
         trade = []
         for trade in self.trade_list:
-            trade = []
+            trade_converted = []
             for column in trade:
-                if str(column) == 16:
+                if len(str(column)) == 16:
                     if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
                         swap = ""
                         should_month = column[0:2]
@@ -99,13 +100,13 @@ class TradingSystem:
                         year = column[6:11]
                         hour = column[11:13]
                         minutes = column[14:]
-                        correct_date = should_month + "/" + should_day + "/" + year + " " + hour + ":" + minutes
-                        trade.append(correct_date)
+                        correct_date = should_month + "/" + should_day + "/" + year + "" + hour + ":" + minutes
+                        trade_converted.append(correct_date)
                     else:
-                        trade.append(column)
+                        trade_converted.append(column)
                 else:
-                    trade.append(column)
-            converted_trade_list.append(trade)
+                    trade_converted.append(column)
+            converted_trade_list.append(trade_converted)
         self.trade_list = converted_trade_list
     #Print trades on console
     def print_trade_list(self):

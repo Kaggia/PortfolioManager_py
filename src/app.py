@@ -54,7 +54,6 @@ class MainWindow:
 
         self.__load_menu_bar__()
         self.__load_loading_options__()
-        self.__add_separator__()
         self.__load_selecting_system__()
         self.__attach_handlers__()
         
@@ -121,9 +120,6 @@ class MainWindow:
         self.clear_portfolio_btn.setGeometry(QtCore.QRect(self.spacing_left, y, 150, 31))
         self.font.setPointSize(22)
         self.clear_portfolio_btn.setText("Clear Portfolio")
-    #Define a separator, based on png file
-    def __add_separator__(self):
-       pass
     #Load the sectione relative to the selection of a single or multiple systems
     def __load_selecting_system__(self):
         #LABEL
@@ -215,11 +211,13 @@ class MainWindow:
 class DetailWindow:
     def __init__(self, _unordered_list_of_trades, _timeFilter='01/01/2000 00:00'):
         self.trades = _unordered_list_of_trades
+        
         self.__order_raw_trade_list__()
         self.trades = self.__select_data_from__(_timeFilter)
-        #for trade in self.trades:
-        #    print(trade)
         
+        for trade in self.trades:
+            print(trade)
+
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
         self.frame.setWindowTitle("cTrader - Portfolio Manager - Detail window")
@@ -308,7 +306,7 @@ class DetailWindow:
                         internal_date = self.__convert_date_to_internalDate__(column[0:2], column[3:5], column[6:11], column[11:13], column[14:])
                         trade.append(internal_date)
                         break  
-                
+               
         #For every trade add a column with value, derived from date format
         ordered_list = sorted(self.trades, key=itemgetter(-1))
         self.trades = ordered_list
@@ -317,6 +315,9 @@ class DetailWindow:
         for trade in self.trades:
             trade[0] = trade_id
             trade_id += 1
+        
+        #fm = FileManager()
+        #fm.dump_list_of_list("dump.txt", self.trades)      
     #selects data from the date specifiend on
     def __select_data_from__(self, _timeFilter):
         internal_date = self.__convert_date_to_internalDate__(_timeFilter[0:2], _timeFilter[3:5], _timeFilter[6:11], _timeFilter[11:13], _timeFilter[14:])
@@ -327,7 +328,7 @@ class DetailWindow:
 
         return selected_trades_to_show
     #convert a date(string) to a internalDate Value, letting the list be ordered
-    def __convert_date_to_internalDate__(self, _day, _month, _year, _hour, _minute):
+    def __convert_date_to_internalDate__(self, _month, _day, _year, _hour, _minute):
         day_value = (int(_day) - 1 ) * 1440
         month_value = (int(_month) - 1 ) * 43800
         year_value = (int(_year) - 2000 ) * 524160

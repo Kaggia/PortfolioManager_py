@@ -17,3 +17,11 @@ class FileManager:
     #salva un file, nella cartella di destinazione specificata <NOT_IMPL>
     def save_file(self, completePath):
         pass
+    def dump_list_of_list(self, complete_path, listToDump):
+        sum_of_text = ""
+        txt_file = open(complete_path, "w")
+        for m_elem in listToDump:
+            for s_elem in m_elem:
+                sum_of_text = sum_of_text + str(s_elem) + "\n"
+            txt_file.write(sum_of_text)
+            sum_of_text = ""
