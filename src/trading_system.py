@@ -112,16 +112,25 @@ class TradingSystem:
     #Detect current fraction of volume, and get it as float
     def get_volume_as_fraction(self):
         #dict_of_scales = {'k' : 0.01, 'm': 10}
+        market_found = ""
         value_volume = 0
         volume_index = self.__colums_checkList__.index('Volume')
         first_raw_volume = self.trade_list[0][volume_index] 
+        if first_raw_volume.find("Indices") != -1:
+            market_found = 'i'
+        else:
+            #check if it is forex or comm
+            if first_raw_volume.find("k") != -1 or first_raw_volume.find("m") != -1:
+                market_found = 'f'
+            else:
+                market_found = 'c'
         #check for integrity of volume
         isInt = True
         for trade in self.trade_list:
             if trade[volume_index] != first_raw_volume:
                 print("ERROR: Volume detected changes during the trading.")
-                isInt = False
-        if isInt:
+                isInt = False    
+        if isInt and market_found == 'f': 
             clean_volume = first_raw_volume[first_raw_volume.rfind(" ")+1:]
             if clean_volume[-1] == 'k':
                 value_volume = float(clean_volume [:-1]) / 100
@@ -130,6 +139,14 @@ class TradingSystem:
                 print("WARNING: High volume(Million) detected, check implementation.")
                 value_volume = float(clean_volume [:-1]) * 10
                 print("INFO: Volume as fraction is-> " + str(value_volume))
+        elif isInt and market_found == 'i':  
+            clean_volume = first_raw_volume[:first_raw_volume.find(" ")]
+            value_volume = float(clean_volume)
+            print("INFO: Volume as fraction is-> " + str(value_volume))
+        elif isInt and market_found == 'c':
+            clean_volume = first_raw_volume[:first_raw_volume.find(" ")]
+            value_volume = float(clean_volume)
+            print("INFO: Volume as fraction is-> " + str(value_volume))
         return value_volume
     #Print trades on console
     def print_trade_list(self):
