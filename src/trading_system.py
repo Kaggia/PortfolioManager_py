@@ -11,11 +11,12 @@ class TradingSystem:
         self.symbol = None
         self.trade_list = None
         self.indexes = None 
-        self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Close Time', 'Net']
+        self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Volume', 'Close Time', 'Net']
         #Elaboration
         self.__clear_columns_name__(ts_filepath)
         self.__clear_columns_name__(ts_filepath)
         self.__load_data_from_csv__(ts_filepath) 
+        self.volume = self.get_volume_as_fraction() #float   
     #scan a csv file, getting data from it
     def __load_data_from_csv__(self, filepath):
         if self.__check_file_integrity__(filepath):
@@ -108,6 +109,28 @@ class TradingSystem:
                     trade_converted.append(column)
             converted_trade_list.append(trade_converted)
         self.trade_list = converted_trade_list
+    #Detect current fraction of volume, and get it as float
+    def get_volume_as_fraction(self):
+        #dict_of_scales = {'k' : 0.01, 'm': 10}
+        value_volume = 0
+        volume_index = self.__colums_checkList__.index('Volume')
+        first_raw_volume = self.trade_list[0][volume_index] 
+        #check for integrity of volume
+        isInt = True
+        for trade in self.trade_list:
+            if trade[volume_index] != first_raw_volume:
+                print("ERROR: Volume detected changes during the trading.")
+                isInt = False
+        if isInt:
+            clean_volume = first_raw_volume[first_raw_volume.rfind(" ")+1:]
+            if clean_volume[-1] == 'k':
+                value_volume = float(clean_volume [:-1]) / 100
+                print("INFO: Volume as fraction is-> " + str(value_volume))
+            else:
+                print("WARNING: High volume(Million) detected, check implementation.")
+                value_volume = float(clean_volume [:-1]) * 10
+                print("INFO: Volume as fraction is-> " + str(value_volume))
+        return value_volume
     #Print trades on console
     def print_trade_list(self):
         for row in self.trade_list:
