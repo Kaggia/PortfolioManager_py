@@ -21,6 +21,7 @@ class MainWindow:
         self.__file_manager__ = FileManager()
         self.__secondary_windows__ = []
         self.isFirstLoad = True
+        self.summary = None
         
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(1024, 720)
@@ -122,6 +123,8 @@ class MainWindow:
         self.clear_portfolio_btn.setGeometry(QtCore.QRect(self.spacing_left, y, 150, 31))
         self.font.setPointSize(22)
         self.clear_portfolio_btn.setText("Clear Portfolio")
+
+        
     #Load the sectione relative to the selection of a single or multiple systems
     def __load_selecting_system__(self):
         #LABEL
@@ -138,70 +141,90 @@ class MainWindow:
         self.font.setPointSize(22)
         self.loadDetails_btn.setText("Load details")
     #Load summary of selected TS
-    def __load_summary_trading_system__(self): 
-        font = QtGui.QFont()
-        self.groupBox_ts = QtWidgets.QGroupBox(self.frame)
-        self.groupBox_ts.setGeometry(QtCore.QRect(500, 175, 150, 100))
-        gridLayout = QtWidgets.QGridLayout()
+    def __load_summary_trading_system__(self):   
+        print("INFO: Summary will be loaded")
+        ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
+        print("INFO: Summary will be loaded with <" + str(ID_instr_to_load) + "> id trading system.")
+        trade_list = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list
 
-        #FIXED_LABELS
-        self.summary_text_label_0 = QtWidgets.QLabel(self.frame)
-        self.summary_text_label_0.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_text_label_0.setText("")
+        #<IMPLEMENT> Caricare i dati direttamente dal trading system - name
+        #<IMPLEMENT> Caricare i dati direttamente dal trading system - symbol
+        #<IMPLEMENT> Caricare i dati direttamente dal trading system - quantity
 
-        self.summary_text_label_1 = QtWidgets.QLabel(self.frame)
-        self.summary_text_label_1.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_text_label_1.setText("Summary")
+        name_text = ""
+        name_symbol = ""
+        name_quantity = ""
 
-        self.summary_text_label_2 = QtWidgets.QLabel(self.frame)
-        self.summary_text_label_2.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_text_label_2.setText("")
+        if self.summary == None:
+            font = QtGui.QFont()
+            groupBox_ts = QtWidgets.QGroupBox(self.frame)
+            groupBox_ts.setGeometry(QtCore.QRect(500, 175, 150, 100))
+            gridLayout = QtWidgets.QGridLayout()
 
-        self.summary_name_label = QtWidgets.QLabel(self.frame)
-        self.summary_name_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_name_label.setText("Name: ")
+            #FIXED_LABELS
+            self.summary_text_label_0 = QtWidgets.QLabel(self.frame)
+            self.summary_text_label_0.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_text_label_0.setText("")
 
-        self.summary_symbol_label = QtWidgets.QLabel(self.frame)
-        self.summary_symbol_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_symbol_label.setText("Symbol: ")
+            self.summary_text_label_1 = QtWidgets.QLabel(self.frame)
+            self.summary_text_label_1.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_text_label_1.setText("Summary")
 
-        self.summary_qnt_label = QtWidgets.QLabel(self.frame)
-        self.summary_qnt_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_qnt_label.setText("Quantity: ")
-        #VALUE_LABELS
-        self.summary_name_value_label = QtWidgets.QLabel(self.frame)
-        self.summary_name_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_name_value_label.setText("------")
+            self.summary_text_label_2 = QtWidgets.QLabel(self.frame)
+            self.summary_text_label_2.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_text_label_2.setText("")
 
-        self.summary_symbol_value_label = QtWidgets.QLabel(self.frame)
-        self.summary_symbol_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_symbol_value_label.setText("------")
+            self.summary_name_label = QtWidgets.QLabel(self.frame)
+            self.summary_name_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_name_label.setText("Name: ")
 
-        self.summary_qnt_value_label = QtWidgets.QLabel(self.frame)
-        self.summary_qnt_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-        font.setPointSize(22)
-        self.summary_qnt_value_label.setText("------")
+            self.summary_symbol_label = QtWidgets.QLabel(self.frame)
+            self.summary_symbol_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_symbol_label.setText("Symbol: ")
 
-        gridLayout.addWidget(self.summary_text_label_0, 0, 0)
-        gridLayout.addWidget(self.summary_text_label_1, 0, 1)
-        gridLayout.addWidget(self.summary_text_label_2, 0, 2)
-        gridLayout.addWidget(self.summary_name_label, 1, 0)
-        gridLayout.addWidget(self.summary_symbol_label, 2, 0)
-        gridLayout.addWidget(self.summary_qnt_label, 3, 0)
+            self.summary_qnt_label = QtWidgets.QLabel(self.frame)
+            self.summary_qnt_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_qnt_label.setText("Quantity: ")
+            #VALUE_LABELS
+            self.summary_name_value_label = QtWidgets.QLabel(self.frame)
+            self.summary_name_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_name_value_label.setText(name_text)
 
-        gridLayout.addWidget(self.summary_name_value_label, 1, 1)
-        gridLayout.addWidget(self.summary_symbol_value_label, 2, 1)
-        gridLayout.addWidget(self.summary_qnt_value_label, 3, 1)
+            self.summary_symbol_value_label = QtWidgets.QLabel(self.frame)
+            self.summary_symbol_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_symbol_value_label.setText(symbol_text)
 
-        self.groupBox_ts.setLayout(gridLayout)
+            self.summary_qnt_value_label = QtWidgets.QLabel(self.frame)
+            self.summary_qnt_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            font.setPointSize(22)
+            self.summary_qnt_value_label.setText("------")
+
+            gridLayout.addWidget(self.summary_text_label_0, 0, 0)
+            gridLayout.addWidget(self.summary_text_label_1, 0, 1)
+            gridLayout.addWidget(self.summary_text_label_2, 0, 2)
+            gridLayout.addWidget(self.summary_name_label, 1, 0)
+            gridLayout.addWidget(self.summary_symbol_label, 2, 0)
+            gridLayout.addWidget(self.summary_qnt_label, 3, 0)
+
+            gridLayout.addWidget(self.summary_name_value_label, 1, 1)
+            gridLayout.addWidget(self.summary_symbol_value_label, 2, 1)
+            gridLayout.addWidget(self.summary_qnt_value_label, 3, 1)
+
+            groupBox_ts.setLayout(gridLayout)
+            groupBox_ts.show()
+            self.summary = groupBox_ts
+        else:
+            print("INFO: Data will be clean and shown.")
+            #clean_values and load_new_values
+            pass
     #Attach event handlers to the graphical obj
     def __attach_handlers__(self):
         self.add_system_btn.clicked.connect(self.add_system_btn_Onclick)
@@ -212,6 +235,8 @@ class MainWindow:
         self.actionExitApp.triggered.connect(self.close_window_Onclik)
         self.addSystemOption.triggered.connect(self.add_system_btn_Onclick)
         self.clearPortfolio.triggered.connect(self.clear_portfolio_btn_Onclick)
+        #Action in combobox
+        self.remove_selected_item_cbox.currentTextChanged.connect(self.__load_summary_trading_system__)
     #ADD_SYSTEM_BUTTON_HANDLER
     def add_system_btn_Onclick(self):
         list_of_files = self.__file_manager__.get_files()
