@@ -152,8 +152,8 @@ class MainWindow:
         #<IMPLEMENT> Caricare i dati direttamente dal trading system - quantity
 
         name_text = ""
-        name_symbol = ""
-        name_quantity = ""
+        symbol_text = ""
+        qnt_text = "" 
 
         if self.summary == None:
             font = QtGui.QFont()
