@@ -341,11 +341,18 @@ class MainWindow:
         self.frame.close()
     #show detail window of selected ts or portfolio
     def show_details(self):
+        #if self.isFirstLoad == False:
+        #    print("INFO: This is a second load, last columns of trades will be deleted.")
+        #    for ts in self.current_portfolio.trading_systems:
+        #        for trade in ts.trade_list:
+        #            trade.pop(-1)
         if self.isFirstLoad == False:
             print("INFO: This is a second load, last columns of trades will be deleted.")
             for ts in self.current_portfolio.trading_systems:
                 for trade in ts.trade_list:
-                    trade.pop(-1)
+                    if trade[-1] >= 1000000:
+                        trade.pop(-1)
+        
             
         self.isFirstLoad = False
         ID_instr_to_load = self.loadDetails_selected_item_cbox.currentText()[:self.loadDetails_selected_item_cbox.currentText().find(' :')]
@@ -371,8 +378,15 @@ class DetailWindow:
     def __init__(self, _unordered_list_of_trades, _timeFilter='01/01/2000 00:00'):
         self.trades = _unordered_list_of_trades
         
+        for trade in self.trades:
+            print(trade)
+
         self.__order_raw_trade_list__()
         self.trades = self.__select_data_from__(_timeFilter)
+
+        for trade in self.trades:
+            print(trade)
+
 
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
