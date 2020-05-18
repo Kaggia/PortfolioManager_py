@@ -377,16 +377,9 @@ class MainWindow:
 class DetailWindow:
     def __init__(self, _unordered_list_of_trades, _timeFilter='01/01/2000 00:00'):
         self.trades = _unordered_list_of_trades
-        
-        for trade in self.trades:
-            print(trade)
 
         self.__order_raw_trade_list__()
         self.trades = self.__select_data_from__(_timeFilter)
-
-        for trade in self.trades:
-            print(trade)
-
 
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
@@ -598,4 +591,4 @@ class MplCanvas(FigureCanvasQTAgg):
         self.axes.set_xlabel(_xLabel)
         super(MplCanvas, self).__init__(fig)
 
-#<DEBUG> Error when deleting a TS
+#<IMPLEMENT> Net profit, in every system must reflect the quantity.
