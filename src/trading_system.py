@@ -11,6 +11,7 @@ class TradingSystem:
         self.symbol = None
         self.trade_list = None
         self.indexes = None 
+        self.market = ""
         self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Volume', 'Close Time', 'Net']
         #Elaboration
         self.__clear_columns_name__(ts_filepath)
@@ -118,12 +119,15 @@ class TradingSystem:
         first_raw_volume = self.trade_list[0][volume_index] 
         if first_raw_volume.find("Indices") != -1:
             market_found = 'i'
+            self.market = market_found
         else:
             #check if it is forex or comm
             if first_raw_volume.find("k") != -1 or first_raw_volume.find("m") != -1:
                 market_found = 'f'
+                self.market = market_found
             else:
                 market_found = 'c'
+                self.market = market_found
         #check for integrity of volume
         isInt = True
         for trade in self.trade_list:

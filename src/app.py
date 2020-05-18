@@ -22,6 +22,7 @@ class MainWindow:
         self.__secondary_windows__ = []
         self.isFirstLoad = True
         self.summary = None
+        self.isQuantityChangedByMethod = False
         
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(1024, 720)
@@ -57,8 +58,6 @@ class MainWindow:
         self.__load_loading_options__()
         self.__load_selecting_system__()
         self.__attach_handlers__()
-        
-        #self.__load_summary_trading_system__() #Need to be removed, when finished
 
         self.frame.show()
     #Load menu bar: File|Options|Help
@@ -123,8 +122,6 @@ class MainWindow:
         self.clear_portfolio_btn.setGeometry(QtCore.QRect(self.spacing_left, y, 150, 31))
         self.font.setPointSize(22)
         self.clear_portfolio_btn.setText("Clear Portfolio")
-
-        
     #Load the sectione relative to the selection of a single or multiple systems
     def __load_selecting_system__(self):
         #LABEL
@@ -140,6 +137,12 @@ class MainWindow:
         self.loadDetails_btn.setGeometry(QtCore.QRect(self.spacing_left +300, 400, 150, 31))
         self.font.setPointSize(22)
         self.loadDetails_btn.setText("Load details")
+        #Warning wrong quantity label
+        self.wrong_qnt_label = QtWidgets.QLabel(self.frame)
+        self.wrong_qnt_label.setGeometry(QtCore.QRect(self.spacing_left +460, 400, 175, 31))
+        self.font.setPointSize(22)
+        self.wrong_qnt_label.setText("Can't load. Quantity is not valid.")
+        self.wrong_qnt_label.hide()
     #Load summary of selected TS
     def __load_summary_trading_system__(self):   
         ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
@@ -198,10 +201,10 @@ class MainWindow:
             font.setPointSize(22)
             self.summary_symbol_value_label.setText(symbol_text)
 
-            self.summary_qnt_value_label = QtWidgets.QLabel(self.frame)
-            self.summary_qnt_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            self.summary_qnt_value_textbox = QtWidgets.QTextEdit(self.frame)
+            self.summary_qnt_value_textbox.setGeometry(QtCore.QRect(500, 175, 75, 31))
             font.setPointSize(22)
-            self.summary_qnt_value_label.setText(qnt_text)
+            self.summary_qnt_value_textbox.setText(qnt_text)
 
             gridLayout.addWidget(self.summary_text_label_0, 0, 0)
             gridLayout.addWidget(self.summary_text_label_1, 0, 1)
@@ -212,15 +215,60 @@ class MainWindow:
 
             gridLayout.addWidget(self.summary_name_value_label, 1, 1)
             gridLayout.addWidget(self.summary_symbol_value_label, 2, 1)
-            gridLayout.addWidget(self.summary_qnt_value_label, 3, 1)
+            gridLayout.addWidget(self.summary_qnt_value_textbox, 3, 1)
 
             groupBox_ts.setLayout(gridLayout)
             groupBox_ts.show()
             self.summary = groupBox_ts
+
+            #Value changed in Textbox in quantity
+            self.summary_qnt_value_textbox.textChanged.connect(self.__check_value_of_quantity__)
         else:
-            print("INFO: Data will be clean and shown.")
-            #clean_values and load_new_values
-            pass
+            self.summary_name_value_label.setText(name_text)
+            self.summary_symbol_value_label.setText(symbol_text)
+            self.summary_qnt_value_textbox.setText(qnt_text)
+    #Check value of quantity in textbox
+    def __check_value_of_quantity__(self):
+        ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
+        selected_trading_system = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1]
+        market = selected_trading_system.market
+        changed_value = self.summary_qnt_value_textbox.toPlainText()
+
+        if market == 'f':
+            try:
+                float(changed_value)
+                self.wrong_qnt_label.hide()
+                self.loadDetails_btn.setEnabled(True)
+                if float(changed_value) <= 0.0:
+                    self.wrong_qnt_label.show()
+                    self.loadDetails_btn.setEnabled(False)
+            except ValueError:
+                self.wrong_qnt_label.show()
+                self.loadDetails_btn.setEnabled(False)
+        elif market == 'i':
+            try:
+                int(changed_value)
+                self.wrong_qnt_label.hide()
+                self.loadDetails_btn.setEnabled(True)
+                if int(changed_value) <= 0:
+                    self.wrong_qnt_label.show()
+                    self.loadDetails_btn.setEnabled(False)
+            except ValueError:
+                self.wrong_qnt_label.show()
+                self.loadDetails_btn.setEnabled(False)
+        elif market == 'c':
+            try:
+                float(changed_value)
+                int(changed_value)
+                self.wrong_qnt_label.hide()
+                self.loadDetails_btn.setEnabled(True)
+                if float(changed_value) < 0.0:
+                    self.wrong_qnt_label.show()
+                    self.loadDetails_btn.setEnabled(False)
+            except ValueError:
+                self.wrong_qnt_label.show()
+                self.loadDetails_btn.setEnabled(False)
+        
     #Attach event handlers to the graphical obj
     def __attach_handlers__(self):
         self.add_system_btn.clicked.connect(self.add_system_btn_Onclick)
@@ -232,7 +280,7 @@ class MainWindow:
         self.addSystemOption.triggered.connect(self.add_system_btn_Onclick)
         self.clearPortfolio.triggered.connect(self.clear_portfolio_btn_Onclick)
         #Action in combobox
-        self.remove_selected_item_cbox.currentTextChanged.connect(self.__load_summary_trading_system__)
+        self.remove_selected_item_cbox.currentTextChanged.connect(self.__load_summary_trading_system__)       
     #ADD_SYSTEM_BUTTON_HANDLER
     def add_system_btn_Onclick(self):
         list_of_files = self.__file_manager__.get_files()
