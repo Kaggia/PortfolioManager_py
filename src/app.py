@@ -146,8 +146,8 @@ class MainWindow:
     #Load summary of selected TS
     def __load_summary_trading_system__(self):   
         if self.isQuantityChangedByMethod == False:
+            print("Value changed")
             ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
-            print(ID_instr_to_load)
             trade_list = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list
             name_index =  self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Label")
             symbol_index = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Symbol")
@@ -226,11 +226,10 @@ class MainWindow:
                 #Value changed in Textbox in quantity
                 self.summary_qnt_value_textbox.textChanged.connect(self.__check_value_of_quantity__)
             else:
+                self.summary.show()
                 self.summary_name_value_label.setText(name_text)
                 self.summary_symbol_value_label.setText(symbol_text)
                 self.summary_qnt_value_textbox.setText(qnt_text)
-        else:
-            print("Quantity changed by a method")
     #Check value of quantity in textbox
     def __check_value_of_quantity__(self):
         ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
@@ -303,7 +302,7 @@ class MainWindow:
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
         self.isQuantityChangedByMethod = True
-        if len(self.current_portfolio.trading_systems)>1:
+        if len(self.current_portfolio.trading_systems)>=1:
             id_ts_to_remove = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
             self.current_portfolio.remove_system(int(id_ts_to_remove)-1)
             self.remove_selected_item_cbox.clear()
@@ -316,8 +315,14 @@ class MainWindow:
                 complete_item_name = str(str(ts.id) + " : " + str(ts.name))
                 self.remove_selected_item_cbox.addItem(complete_item_name)
         else:
+            print("Clearing")
             self.remove_selected_item_cbox.clear()
-
+            if self.summary != None:
+                self.summary.hide()
+        if len(self.current_portfolio.trading_systems)== 0:
+            if self.summary != None:
+                self.summary.hide()
+        
         id_progr = 0
     #CLEAR_PORTFOLIO_BUTTON_HANDLER
     def clear_portfolio_btn_Onclick(self):
