@@ -145,88 +145,92 @@ class MainWindow:
         self.wrong_qnt_label.hide()
     #Load summary of selected TS
     def __load_summary_trading_system__(self):   
-        ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
-        trade_list = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list
-        name_index =  self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Label")
-        symbol_index = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Symbol")
+        if self.isQuantityChangedByMethod == False:
+            ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
+            print(ID_instr_to_load)
+            trade_list = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list
+            name_index =  self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Label")
+            symbol_index = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Symbol")
 
-        name_text = trade_list[0][name_index]
-        symbol_text = trade_list[0][symbol_index]
-        qnt_text = str(self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].volume)
+            name_text = trade_list[0][name_index]
+            symbol_text = trade_list[0][symbol_index]
+            qnt_text = str(self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].volume)
 
-        if self.summary == None:
-            font = QtGui.QFont()
-            groupBox_ts = QtWidgets.QGroupBox(self.frame)
-            groupBox_ts.setGeometry(QtCore.QRect(425, 200, 240, 100))
-            gridLayout = QtWidgets.QGridLayout()
+            if self.summary == None:
+                font = QtGui.QFont()
+                groupBox_ts = QtWidgets.QGroupBox(self.frame)
+                groupBox_ts.setGeometry(QtCore.QRect(425, 200, 240, 100))
+                gridLayout = QtWidgets.QGridLayout()
 
-            #FIXED_LABELS
-            self.summary_text_label_0 = QtWidgets.QLabel(self.frame)
-            self.summary_text_label_0.setGeometry(QtCore.QRect(500, 175, 150, 31))
-            font.setPointSize(22)
-            self.summary_text_label_0.setText("")
+                #FIXED_LABELS
+                self.summary_text_label_0 = QtWidgets.QLabel(self.frame)
+                self.summary_text_label_0.setGeometry(QtCore.QRect(500, 175, 150, 31))
+                font.setPointSize(22)
+                self.summary_text_label_0.setText("")
 
-            self.summary_text_label_1 = QtWidgets.QLabel(self.frame)
-            self.summary_text_label_1.setGeometry(QtCore.QRect(500, 175, 150, 31))
-            font.setPointSize(22)
-            self.summary_text_label_1.setText("Summary")
+                self.summary_text_label_1 = QtWidgets.QLabel(self.frame)
+                self.summary_text_label_1.setGeometry(QtCore.QRect(500, 175, 150, 31))
+                font.setPointSize(22)
+                self.summary_text_label_1.setText("Summary")
 
-            self.summary_text_label_2 = QtWidgets.QLabel(self.frame)
-            self.summary_text_label_2.setGeometry(QtCore.QRect(500, 175, 150, 31))
-            font.setPointSize(22)
-            self.summary_text_label_2.setText("")
+                self.summary_text_label_2 = QtWidgets.QLabel(self.frame)
+                self.summary_text_label_2.setGeometry(QtCore.QRect(500, 175, 150, 31))
+                font.setPointSize(22)
+                self.summary_text_label_2.setText("")
 
-            self.summary_name_label = QtWidgets.QLabel(self.frame)
-            self.summary_name_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-            font.setPointSize(22)
-            self.summary_name_label.setText("Name: ")
+                self.summary_name_label = QtWidgets.QLabel(self.frame)
+                self.summary_name_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+                font.setPointSize(22)
+                self.summary_name_label.setText("Name: ")
 
-            self.summary_symbol_label = QtWidgets.QLabel(self.frame)
-            self.summary_symbol_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-            font.setPointSize(22)
-            self.summary_symbol_label.setText("Symbol: ")
+                self.summary_symbol_label = QtWidgets.QLabel(self.frame)
+                self.summary_symbol_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+                font.setPointSize(22)
+                self.summary_symbol_label.setText("Symbol: ")
 
-            self.summary_qnt_label = QtWidgets.QLabel(self.frame)
-            self.summary_qnt_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-            font.setPointSize(22)
-            self.summary_qnt_label.setText("Quantity: ")
-            #VALUE_LABELS
-            self.summary_name_value_label = QtWidgets.QLabel(self.frame)
-            self.summary_name_value_label.setGeometry(QtCore.QRect(500, 175, 175, 31))
-            font.setPointSize(22)
-            self.summary_name_value_label.setText(name_text)
+                self.summary_qnt_label = QtWidgets.QLabel(self.frame)
+                self.summary_qnt_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+                font.setPointSize(22)
+                self.summary_qnt_label.setText("Quantity: ")
+                #VALUE_LABELS
+                self.summary_name_value_label = QtWidgets.QLabel(self.frame)
+                self.summary_name_value_label.setGeometry(QtCore.QRect(500, 175, 175, 31))
+                font.setPointSize(22)
+                self.summary_name_value_label.setText(name_text)
 
-            self.summary_symbol_value_label = QtWidgets.QLabel(self.frame)
-            self.summary_symbol_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
-            font.setPointSize(22)
-            self.summary_symbol_value_label.setText(symbol_text)
+                self.summary_symbol_value_label = QtWidgets.QLabel(self.frame)
+                self.summary_symbol_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+                font.setPointSize(22)
+                self.summary_symbol_value_label.setText(symbol_text)
 
-            self.summary_qnt_value_textbox = QtWidgets.QTextEdit(self.frame)
-            self.summary_qnt_value_textbox.setGeometry(QtCore.QRect(500, 175, 75, 31))
-            font.setPointSize(22)
-            self.summary_qnt_value_textbox.setText(qnt_text)
+                self.summary_qnt_value_textbox = QtWidgets.QTextEdit(self.frame)
+                self.summary_qnt_value_textbox.setGeometry(QtCore.QRect(500, 175, 75, 31))
+                font.setPointSize(22)
+                self.summary_qnt_value_textbox.setText(qnt_text)
 
-            gridLayout.addWidget(self.summary_text_label_0, 0, 0)
-            gridLayout.addWidget(self.summary_text_label_1, 0, 1)
-            gridLayout.addWidget(self.summary_text_label_2, 0, 2)
-            gridLayout.addWidget(self.summary_name_label, 1, 0)
-            gridLayout.addWidget(self.summary_symbol_label, 2, 0)
-            gridLayout.addWidget(self.summary_qnt_label, 3, 0)
+                gridLayout.addWidget(self.summary_text_label_0, 0, 0)
+                gridLayout.addWidget(self.summary_text_label_1, 0, 1)
+                gridLayout.addWidget(self.summary_text_label_2, 0, 2)
+                gridLayout.addWidget(self.summary_name_label, 1, 0)
+                gridLayout.addWidget(self.summary_symbol_label, 2, 0)
+                gridLayout.addWidget(self.summary_qnt_label, 3, 0)
 
-            gridLayout.addWidget(self.summary_name_value_label, 1, 1)
-            gridLayout.addWidget(self.summary_symbol_value_label, 2, 1)
-            gridLayout.addWidget(self.summary_qnt_value_textbox, 3, 1)
+                gridLayout.addWidget(self.summary_name_value_label, 1, 1)
+                gridLayout.addWidget(self.summary_symbol_value_label, 2, 1)
+                gridLayout.addWidget(self.summary_qnt_value_textbox, 3, 1)
 
-            groupBox_ts.setLayout(gridLayout)
-            groupBox_ts.show()
-            self.summary = groupBox_ts
+                groupBox_ts.setLayout(gridLayout)
+                groupBox_ts.show()
+                self.summary = groupBox_ts
 
-            #Value changed in Textbox in quantity
-            self.summary_qnt_value_textbox.textChanged.connect(self.__check_value_of_quantity__)
+                #Value changed in Textbox in quantity
+                self.summary_qnt_value_textbox.textChanged.connect(self.__check_value_of_quantity__)
+            else:
+                self.summary_name_value_label.setText(name_text)
+                self.summary_symbol_value_label.setText(symbol_text)
+                self.summary_qnt_value_textbox.setText(qnt_text)
         else:
-            self.summary_name_value_label.setText(name_text)
-            self.summary_symbol_value_label.setText(symbol_text)
-            self.summary_qnt_value_textbox.setText(qnt_text)
+            print("Quantity changed by a method")
     #Check value of quantity in textbox
     def __check_value_of_quantity__(self):
         ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
@@ -267,8 +271,7 @@ class MainWindow:
                     self.loadDetails_btn.setEnabled(False)
             except ValueError:
                 self.wrong_qnt_label.show()
-                self.loadDetails_btn.setEnabled(False)
-        
+                self.loadDetails_btn.setEnabled(False)      
     #Attach event handlers to the graphical obj
     def __attach_handlers__(self):
         self.add_system_btn.clicked.connect(self.add_system_btn_Onclick)
@@ -299,20 +302,30 @@ class MainWindow:
                 self.loadDetails_selected_item_cbox.addItem(complete_item_name)
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
+        self.isQuantityChangedByMethod = True
         if len(self.current_portfolio.trading_systems)>1:
             id_ts_to_remove = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
             self.current_portfolio.remove_system(int(id_ts_to_remove)-1)
             self.remove_selected_item_cbox.clear()
+            self.isQuantityChangedByMethod = False
+            id_progr = 1
+            for ts in self.current_portfolio.trading_systems:
+                ts.id = id_progr
+                id_progr += 1
             for ts in self.current_portfolio.trading_systems:
                 complete_item_name = str(str(ts.id) + " : " + str(ts.name))
                 self.remove_selected_item_cbox.addItem(complete_item_name)
         else:
             self.remove_selected_item_cbox.clear()
+
+        id_progr = 0
     #CLEAR_PORTFOLIO_BUTTON_HANDLER
     def clear_portfolio_btn_Onclick(self):
+        self.isQuantityChangedByMethod == True
         self.current_portfolio.clear()
         self.remove_selected_item_cbox.clear()
         self.loadDetails_selected_item_cbox.clear()
+        self.isQuantityChangedByMethod == False
     #close mainwindow
     def close_window_Onclik(self):
         self.frame.close()
@@ -561,4 +574,4 @@ class MplCanvas(FigureCanvasQTAgg):
         self.axes.set_xlabel(_xLabel)
         super(MplCanvas, self).__init__(fig)
 
- 
+#<DEBUG> Error when deleting a TS
