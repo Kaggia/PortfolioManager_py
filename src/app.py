@@ -142,23 +142,19 @@ class MainWindow:
         self.loadDetails_btn.setText("Load details")
     #Load summary of selected TS
     def __load_summary_trading_system__(self):   
-        print("INFO: Summary will be loaded")
         ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
-        print("INFO: Summary will be loaded with <" + str(ID_instr_to_load) + "> id trading system.")
         trade_list = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list
+        name_index =  self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Label")
+        symbol_index = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Symbol")
 
-        #<IMPLEMENT> Caricare i dati direttamente dal trading system - name
-        #<IMPLEMENT> Caricare i dati direttamente dal trading system - symbol
-        #<IMPLEMENT> Caricare i dati direttamente dal trading system - quantity
-
-        name_text = ""
-        symbol_text = ""
-        qnt_text = "" 
+        name_text = trade_list[0][name_index]
+        symbol_text = trade_list[0][symbol_index]
+        qnt_text = str(self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].volume)
 
         if self.summary == None:
             font = QtGui.QFont()
             groupBox_ts = QtWidgets.QGroupBox(self.frame)
-            groupBox_ts.setGeometry(QtCore.QRect(500, 175, 150, 100))
+            groupBox_ts.setGeometry(QtCore.QRect(425, 200, 240, 100))
             gridLayout = QtWidgets.QGridLayout()
 
             #FIXED_LABELS
@@ -193,7 +189,7 @@ class MainWindow:
             self.summary_qnt_label.setText("Quantity: ")
             #VALUE_LABELS
             self.summary_name_value_label = QtWidgets.QLabel(self.frame)
-            self.summary_name_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
+            self.summary_name_value_label.setGeometry(QtCore.QRect(500, 175, 175, 31))
             font.setPointSize(22)
             self.summary_name_value_label.setText(name_text)
 
@@ -205,7 +201,7 @@ class MainWindow:
             self.summary_qnt_value_label = QtWidgets.QLabel(self.frame)
             self.summary_qnt_value_label.setGeometry(QtCore.QRect(500, 175, 150, 31))
             font.setPointSize(22)
-            self.summary_qnt_value_label.setText("------")
+            self.summary_qnt_value_label.setText(qnt_text)
 
             gridLayout.addWidget(self.summary_text_label_0, 0, 0)
             gridLayout.addWidget(self.summary_text_label_1, 0, 1)
