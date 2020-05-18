@@ -303,6 +303,7 @@ class MainWindow:
     def remove_system_btn_Onclick(self):
         self.isQuantityChangedByMethod = True
         if len(self.current_portfolio.trading_systems)>=1:
+            #Removing system from systems combobox
             id_ts_to_remove = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
             self.current_portfolio.remove_system(int(id_ts_to_remove)-1)
             self.remove_selected_item_cbox.clear()
@@ -314,11 +315,15 @@ class MainWindow:
             for ts in self.current_portfolio.trading_systems:
                 complete_item_name = str(str(ts.id) + " : " + str(ts.name))
                 self.remove_selected_item_cbox.addItem(complete_item_name)
+            #Removing system from details combobox
+            self.loadDetails_selected_item_cbox.clear()
+            self.loadDetails_selected_item_cbox.addItem("0 : Portfolio")
+            for ts in self.current_portfolio.trading_systems:
+                complete_item_name = str(str(ts.id) + " : " + str(ts.name))
+                self.loadDetails_selected_item_cbox.addItem(complete_item_name)
         else:
             print("Clearing")
             self.remove_selected_item_cbox.clear()
-            if self.summary != None:
-                self.summary.hide()
         if len(self.current_portfolio.trading_systems)== 0:
             if self.summary != None:
                 self.summary.hide()
