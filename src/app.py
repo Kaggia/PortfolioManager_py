@@ -146,7 +146,6 @@ class MainWindow:
     #Load summary of selected TS
     def __load_summary_trading_system__(self):   
         if self.isQuantityChangedByMethod == False:
-            print("Value changed")
             ID_instr_to_load = self.remove_selected_item_cbox.currentText()[:self.remove_selected_item_cbox.currentText().find(' :')]
             trade_list = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list
             name_index =  self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].__colums_checkList__.index("Label")
@@ -225,6 +224,7 @@ class MainWindow:
 
                 #Value changed in Textbox in quantity
                 self.summary_qnt_value_textbox.textChanged.connect(self.__check_value_of_quantity__)
+                self.summary.show()
             else:
                 self.summary.show()
                 self.summary_name_value_label.setText(name_text)
@@ -310,6 +310,7 @@ class MainWindow:
             else:
                 self.loadDetails_selected_item_cbox.addItem(complete_item_name)
         print(self.current_portfolio.scalings)
+        
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
         self.isQuantityChangedByMethod = True
@@ -339,13 +340,16 @@ class MainWindow:
                 self.summary.hide()
     #CLEAR_PORTFOLIO_BUTTON_HANDLER
     def clear_portfolio_btn_Onclick(self):
-        self.isQuantityChangedByMethod == True
+        self.isQuantityChangedByMethod = True
         self.current_portfolio.clear()
         self.remove_selected_item_cbox.clear()
         self.loadDetails_selected_item_cbox.clear()
-        self.isQuantityChangedByMethod == False
+        if len(self.current_portfolio.trading_systems)== 0:
+            if self.summary != None:
+                self.summary.hide()
         #reset scalings
         self.current_portfolio.scalings = []
+        self.isQuantityChangedByMethod = False
     #close mainwindow
     def close_window_Onclik(self):
         self.frame.close()
@@ -600,5 +604,3 @@ class MplCanvas(FigureCanvasQTAgg):
         self.axes.set_ylabel(_yLabel)
         self.axes.set_xlabel(_xLabel)
         super(MplCanvas, self).__init__(fig)
-
-#<IMPLEMENT> Net profit, in every system must reflect the quantity.
