@@ -245,6 +245,9 @@ class MainWindow:
                 if float(changed_value) <= 0.0:
                     self.wrong_qnt_label.show()
                     self.loadDetails_btn.setEnabled(False)
+                else:
+                    #Correct value and update the scaling list
+                    self.current_portfolio.update_scaling_by_index(int(ID_instr_to_load)-1, changed_value)
             except ValueError:
                 self.wrong_qnt_label.show()
                 self.loadDetails_btn.setEnabled(False)
@@ -256,6 +259,9 @@ class MainWindow:
                 if int(changed_value) <= 0:
                     self.wrong_qnt_label.show()
                     self.loadDetails_btn.setEnabled(False)
+                else:
+                    #Correct value and update the scaling list
+                    self.current_portfolio.update_scaling_by_index(int(ID_instr_to_load)-1, changed_value)
             except ValueError:
                 self.wrong_qnt_label.show()
                 self.loadDetails_btn.setEnabled(False)
@@ -265,9 +271,12 @@ class MainWindow:
                 int(changed_value)
                 self.wrong_qnt_label.hide()
                 self.loadDetails_btn.setEnabled(True)
-                if float(changed_value) < 0.0:
+                if float(changed_value) <= 0.0:
                     self.wrong_qnt_label.show()
                     self.loadDetails_btn.setEnabled(False)
+                else:
+                    #Correct value and update the scaling list
+                    self.current_portfolio.update_scaling_by_index(int(ID_instr_to_load)-1, changed_value)
             except ValueError:
                 self.wrong_qnt_label.show()
                 self.loadDetails_btn.setEnabled(False)      
@@ -291,6 +300,7 @@ class MainWindow:
             ts_id = len(self.current_portfolio.trading_systems) + 1
             new_ts = TradingSystem(ts_id, selected_file)
             self.current_portfolio.add_system(new_ts)
+            self.current_portfolio.scalings.append(new_ts.volume) #Set the current volume in scaling list
             #add to combobox
             complete_item_name = str(str(new_ts.id) + " : " + str(new_ts.name))
             self.remove_selected_item_cbox.addItem(complete_item_name)
@@ -299,6 +309,7 @@ class MainWindow:
                 self.loadDetails_selected_item_cbox.addItem(complete_item_name)
             else:
                 self.loadDetails_selected_item_cbox.addItem(complete_item_name)
+        print(self.current_portfolio.scalings)
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
         self.isQuantityChangedByMethod = True
@@ -308,10 +319,9 @@ class MainWindow:
             self.current_portfolio.remove_system(int(id_ts_to_remove)-1)
             self.remove_selected_item_cbox.clear()
             self.isQuantityChangedByMethod = False
-            id_progr = 1
-            for ts in self.current_portfolio.trading_systems:
-                ts.id = id_progr
-                id_progr += 1
+            #Indexing
+            self.current_portfolio.indexing() #re-indexing the ts' with consistent indexes
+            
             for ts in self.current_portfolio.trading_systems:
                 complete_item_name = str(str(ts.id) + " : " + str(ts.name))
                 self.remove_selected_item_cbox.addItem(complete_item_name)
@@ -327,8 +337,6 @@ class MainWindow:
         if len(self.current_portfolio.trading_systems)== 0:
             if self.summary != None:
                 self.summary.hide()
-        
-        id_progr = 0
     #CLEAR_PORTFOLIO_BUTTON_HANDLER
     def clear_portfolio_btn_Onclick(self):
         self.isQuantityChangedByMethod == True
@@ -336,6 +344,8 @@ class MainWindow:
         self.remove_selected_item_cbox.clear()
         self.loadDetails_selected_item_cbox.clear()
         self.isQuantityChangedByMethod == False
+        #reset scalings
+        self.current_portfolio.scalings = []
     #close mainwindow
     def close_window_Onclik(self):
         self.frame.close()
