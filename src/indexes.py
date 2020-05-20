@@ -193,7 +193,7 @@ class AvgLosingTrade(CustomIndex):
         lt = LosingTrades(self.__trade_list__)
         lt_value =lt.calculate()
 
-        if gl_value > 0 and lt_value > 0:
+        if gl_value < 0 and lt_value > 0:
             return round(gl_value/lt_value, 2)
         else:
             return 0
