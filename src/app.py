@@ -309,8 +309,7 @@ class MainWindow:
                 self.loadDetails_selected_item_cbox.addItem(complete_item_name)
             else:
                 self.loadDetails_selected_item_cbox.addItem(complete_item_name)
-        print(self.current_portfolio.scalings)
-        
+        print(self.current_portfolio.scalings)      
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
         self.isQuantityChangedByMethod = True
@@ -442,6 +441,7 @@ class DetailWindow:
         max_win_streak = MaxWinningStreak(self.trades)
         max_los_streak = MaxLosingStreak(self.trades)
         size_require = SizeRequirement(self.trades)
+        monthly_return = MonthlyReturn(self.trades)
 
         self.tab_report.add_text(name_of_ts.calculate() + symbol_of_ts.calculate())
         self.tab_report.add_new_index("Net Profit: ", equity.calculate())
@@ -465,6 +465,7 @@ class DetailWindow:
         self.tab_report.add_new_index("Max Win streak: ", max_win_streak.calculate())
         self.tab_report.add_new_index("Max Lose streak: ", max_los_streak.calculate())
         self.tab_report.add_new_index("Size required: ", size_require.calculate())
+        monthly_return.calculate()
     #load dd tab
     def __tab_drawdownChart_loader(self):
         pass

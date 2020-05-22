@@ -1,6 +1,5 @@
 #indexes.py
 #il modulo raccoglie tutti gli indici, ed i metodi per calcolarli
-
 #Define an interface
 class CustomIndex():
     def __init__(self, _tradeList):
@@ -245,3 +244,65 @@ class SizeRequirement(CustomIndex):
         md = MaximumDrawdown(self.__trade_list__)
         
         return round(-2 * md.calculate(), 2)
+#Monthly return
+class MonthlyReturn(CustomIndex):
+    def calculate(self):
+        first_trade = self.__trade_list__[0]
+        for column in first_trade:
+            if len(str(column)) == 16:
+                if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
+                    print("DEBUG: Column data found: " + column)
+                    print("DEBUG: Starting month is: " + str(int(column[:2])))
+                    starting_month = int(column[:2])
+        #Simulating elapsing months    
+        cm = starting_month #current_month
+        month_return = []
+        list_of_monthly_returns = []
+        for trade in self.__trade_list__:
+            for column in trade:
+                if len(str(column)) == 16:
+                    if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
+                        print("DEBUG: This month is: " + str(int(column[:2])))
+                        print("DEBUG: This year is: " + str(int(column[6:10])))
+                        tm = int(column[:2]) #this_month
+                        if int(tm) != int(cm) :
+                            jump = tm - cm
+                            #Jump is from a month of <year-1> to a month of <year>
+                            if jump < 1:
+                                jump = (12 - cm) + tm
+                                print("DEBUG: Jump over next year")
+                                print("--------------------------")
+                                
+                            #Jump is from a month of <year> to a month of <year>
+                            elif jump > 1:
+                                jump = tm - cm
+                                print("DEBUG: Jump over multiple months")
+                                print("--------------------------")
+
+                            #Looping over <empty> trading months
+                            if jump > 1:
+                                list_of_monthly_returns.append(month_return)
+                                month_return = []
+                                month_return.append(0)
+                                for _ in range(jump-1):
+                                    list_of_monthly_returns.append(month_return)
+                                month_return = []
+                                month_return.append(trade[-2])
+                            elif jump == 1:
+                                print("DEBUG: Jump over one month")
+                                print("--------------------------")
+                                list_of_monthly_returns.append(month_return)
+                                month_return = []
+                                month_return.append(trade[-2])
+                        else:
+                            #It is the same month
+                            print("DEBUG: NO JUMP")
+                            print("--------------------------")
+                            month_return.append(trade[-2])
+                        #Assigning the current month
+                        cm = tm
+                        jump = 0
+                            
+        for month in list_of_monthly_returns:
+            print(month)
+
