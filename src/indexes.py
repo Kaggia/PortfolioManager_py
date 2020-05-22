@@ -296,5 +296,9 @@ class MonthlyReturn(CustomIndex):
                         jump = 0
                             
         for month in list_of_monthly_returns:
+            if not month:
+                month.append(0)
+                print("INFO: A month has been found empty, reset to <0>.")
             print(month)
+            
 
