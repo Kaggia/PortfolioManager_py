@@ -354,11 +354,6 @@ class MainWindow:
         self.frame.close()
     #show detail window of selected ts or portfolio
     def show_details(self):
-        #if self.isFirstLoad == False:
-        #    print("INFO: This is a second load, last columns of trades will be deleted.")
-        #    for ts in self.current_portfolio.trading_systems:
-        #        for trade in ts.trade_list:
-        #            trade.pop(-1)
         if self.isFirstLoad == False:
             print("INFO: This is a second load, last columns of trades will be deleted.")
             for ts in self.current_portfolio.trading_systems:
@@ -366,24 +361,50 @@ class MainWindow:
                     if trade[-1] >= 1000000:
                         trade.pop(-1)
         
-            
+        net_index = self.current_portfolio.trading_systems[0].__colums_checkList__.index('Net')  
         self.isFirstLoad = False
         ID_instr_to_load = self.loadDetails_selected_item_cbox.currentText()[:self.loadDetails_selected_item_cbox.currentText().find(' :')]
         unordered_list_of_trades = []
+        mod_trade = []
         if int(ID_instr_to_load) == 0:
             #Load portfolio details
             print("INFO: Portfolio with ID-> " + str(ID_instr_to_load) + " will be shown in details.")
             for ts in self.current_portfolio.trading_systems:
-                for trade in ts.trade_list:
-                    unordered_list_of_trades.append(trade)
-
-                
+                for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
+                    for column in trade:
+                        if trade.index(column) == net_index:
+                            actual_scaling = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].volume
+                            modified_scaling = self.current_portfolio.scalings[ts.id-1]
+                            multypling_factor = round(modified_scaling / actual_scaling, 2)
+                            value = multypling_factor * trade[net_index]
+                            print("actual-> "+ str(actual_scaling) + " mod_scale-> " + str(modified_scaling) + " value-> " + str(value))
+                            mod_trade.append(value)
+                        else:
+                            mod_trade.append(column)
+                    unordered_list_of_trades.append(mod_trade)    
+                    mod_trade = []
+            for trade in unordered_list_of_trades:
+                print(trade)
+                print("")
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
         else:
             #Load System by ID
             print("INFO: System with ID-> " + str(ID_instr_to_load) + " will be shown in details.")
             for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
-                    unordered_list_of_trades.append(trade)
+                    for column in trade:
+                        mod_trade.append(column)
+                    unordered_list_of_trades.append(mod_trade)    
+                    mod_trade = []
+            actual_scaling = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].volume
+            modified_scaling = self.current_portfolio.scalings[int(ID_instr_to_load)-1]
+            multypling_factor = round(modified_scaling / actual_scaling, 2)
+
+            print("Actual scaling: " + str(actual_scaling))
+            print("Modified scaling: " + str(modified_scaling))
+            print("multypling_factor : " + str(multypling_factor))
+
+            #for trade in unordered_list_of_trades:
+            #   trade[net_index] = multypling_factor * trade[net_index]
                 
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades)) 
 #Window where various details are shown
@@ -465,8 +486,7 @@ class DetailWindow:
         self.tab_report.add_new_index("Max Win streak: ", max_win_streak.calculate())
         self.tab_report.add_new_index("Max Lose streak: ", max_los_streak.calculate())
         self.tab_report.add_new_index("Size required: ", size_require.calculate())
-        self.tab_report.add_new_index("Avg monthly return: ", monthly_return.calculate())
-        
+        self.tab_report.add_new_index("Avg monthly return: ", monthly_return.calculate())    
     #load dd tab
     def __tab_drawdownChart_loader(self):
         pass
