@@ -465,7 +465,8 @@ class DetailWindow:
         self.tab_report.add_new_index("Max Win streak: ", max_win_streak.calculate())
         self.tab_report.add_new_index("Max Lose streak: ", max_los_streak.calculate())
         self.tab_report.add_new_index("Size required: ", size_require.calculate())
-        monthly_return.calculate()
+        self.tab_report.add_new_index("Avg monthly return: ", monthly_return.calculate())
+        
     #load dd tab
     def __tab_drawdownChart_loader(self):
         pass

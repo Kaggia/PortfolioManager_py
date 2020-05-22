@@ -265,16 +265,10 @@ class MonthlyReturn(CustomIndex):
                             jump = tm - cm
                             #Jump is from a month of <year-1> to a month of <year>
                             if jump < 1:
-                                jump = (12 - cm) + tm
-                                print("DEBUG: Jump over next year")
-                                print("--------------------------")
-                                
+                                jump = (12 - cm) + tm                               
                             #Jump is from a month of <year> to a month of <year>
                             elif jump > 1:
                                 jump = tm - cm
-                                print("DEBUG: Jump over multiple months")
-                                print("--------------------------")
-
                             #Looping over <empty> trading months
                             if jump > 1:
                                 list_of_monthly_returns.append(month_return)
@@ -294,11 +288,17 @@ class MonthlyReturn(CustomIndex):
                         #Assigning the current month
                         cm = tm
                         jump = 0
-                            
+        months_elapsed = 0   
+        sum_of_profits = 0                 
         for month in list_of_monthly_returns:
             if not month:
                 month.append(0)
                 print("INFO: A month has been found empty, reset to <0>.")
-            print(month)
+        for month in list_of_monthly_returns:
+            months_elapsed += 1
+            sum_of_profits += sum(month)
+        
+        value_to_return = round(sum_of_profits / months_elapsed, 2)
+        return value_to_return
             
 
