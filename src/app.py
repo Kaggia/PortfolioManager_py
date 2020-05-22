@@ -153,7 +153,7 @@ class MainWindow:
 
             name_text = trade_list[0][name_index]
             symbol_text = trade_list[0][symbol_index]
-            qnt_text = str(self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].volume)
+            qnt_text = str(self.current_portfolio.scalings[int(ID_instr_to_load)-1])
 
             if self.summary == None:
                 font = QtGui.QFont()
