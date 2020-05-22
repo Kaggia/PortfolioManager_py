@@ -251,8 +251,6 @@ class MonthlyReturn(CustomIndex):
         for column in first_trade:
             if len(str(column)) == 16:
                 if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
-                    print("DEBUG: Column data found: " + column)
-                    print("DEBUG: Starting month is: " + str(int(column[:2])))
                     starting_month = int(column[:2])
         #Simulating elapsing months    
         cm = starting_month #current_month
@@ -262,8 +260,6 @@ class MonthlyReturn(CustomIndex):
             for column in trade:
                 if len(str(column)) == 16:
                     if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
-                        print("DEBUG: This month is: " + str(int(column[:2])))
-                        print("DEBUG: This year is: " + str(int(column[6:10])))
                         tm = int(column[:2]) #this_month
                         if int(tm) != int(cm) :
                             jump = tm - cm
@@ -289,15 +285,11 @@ class MonthlyReturn(CustomIndex):
                                 month_return = []
                                 month_return.append(trade[-2])
                             elif jump == 1:
-                                print("DEBUG: Jump over one month")
-                                print("--------------------------")
                                 list_of_monthly_returns.append(month_return)
                                 month_return = []
                                 month_return.append(trade[-2])
                         else:
                             #It is the same month
-                            print("DEBUG: NO JUMP")
-                            print("--------------------------")
                             month_return.append(trade[-2])
                         #Assigning the current month
                         cm = tm
