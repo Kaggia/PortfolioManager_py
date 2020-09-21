@@ -3,6 +3,11 @@
 #Libraries
 import pandas as pd
 from os_interactors import FileManager
+
+PRINT_INFO = "INFO: CSV is valid, ready to load."
+PRINT_INFO_2 = "INFO: Volume as fraction is->"
+PRINT_ERROR = "ERROR: Volume detected changes during the trading."
+
 class TradingSystem:
     def __init__(self,_id, ts_filepath):
         #Attributes
@@ -21,7 +26,7 @@ class TradingSystem:
     #scan a csv file, getting data from it
     def __load_data_from_csv__(self, filepath):
         if self.__check_file_integrity__(filepath):
-            print("INFO: CSV is valid, ready to load.")
+            print(PRINT_INFO)
             #Load_TRADE_LIST
             row = []
             self.trade_list = []
@@ -75,13 +80,12 @@ class TradingSystem:
         date_format = 1 #English
         for trade in self.trade_list:
             for column in trade:
-                if len(str(column)) == 16:
-                    if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
-                        should_month = int(column[0:2])
-                        if should_month > 12 :
-                            date_format = 0
-                            print("INFO: Date format detected is <IT>. It will be changed to <ENG>")
-                            return date_format
+                if len(str(column)) == 16 and (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
+                    should_month = int(column[0:2])
+                    if should_month > 12 :
+                        date_format = 0
+                        print("INFO: Date format detected is <IT>. It will be changed to <ENG>")
+                        return date_format
         print("INFO: Date format detected is <ENG>")
         return date_format
     #convert date format
@@ -112,7 +116,6 @@ class TradingSystem:
         self.trade_list = converted_trade_list
     #Detect current fraction of volume, and get it as float
     def get_volume_as_fraction(self):
-        #dict_of_scales = {'k' : 0.01, 'm': 10}
         market_found = ""
         value_volume = 0
         volume_index = self.__colums_checkList__.index('Volume')
@@ -132,25 +135,24 @@ class TradingSystem:
         isInt = True
         for trade in self.trade_list:
             if trade[volume_index] != first_raw_volume:
-                print("ERROR: Volume detected changes during the trading.")
+                print(PRINT_ERROR)
                 isInt = False    
         if isInt and market_found == 'f': 
             clean_volume = first_raw_volume[first_raw_volume.rfind(" ")+1:]
             if clean_volume[-1] == 'k':
                 value_volume = float(clean_volume [:-1]) / 100
-                print("INFO: Volume as fraction is-> " + str(value_volume))
+                print(PRINT_INFO_2 + str(value_volume))
             else:
                 print("WARNING: High volume(Million) detected, check implementation.")
                 value_volume = float(clean_volume [:-1]) * 10
-                print("INFO: Volume as fraction is-> " + str(value_volume))
+                print(PRINT_INFO_2 + str(value_volume))
         elif isInt and market_found == 'i':  
             clean_volume = first_raw_volume[:first_raw_volume.find(" ")]
             value_volume = float(clean_volume)
-            print("INFO: Volume as fraction is-> " + str(value_volume))
+            print(PRINT_INFO_2 + str(value_volume))
         elif isInt and market_found == 'c':
-            clean_volume = first_raw_volume[:first_raw_volume.find(" ")]
-            value_volume = float(clean_volume)
-            print("INFO: Volume as fraction is-> " + str(value_volume))
+            value_volume = float(first_raw_volume[:first_raw_volume.find(" ")])
+            print(PRINT_INFO_2 + str(value_volume))
         return value_volume
     #Print trades on console
     def print_trade_list(self):
