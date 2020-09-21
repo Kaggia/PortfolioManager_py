@@ -3,6 +3,7 @@
 #Libraries
 from PyQt5 import QtCore, QtGui, QtWidgets
 from operator import itemgetter
+from copy import deepcopy
 import os
 import numpy as np
 import pandas as pd
@@ -426,7 +427,7 @@ class DetailWindow:
         self.tab_report = ReportTab(2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
         self.tab_drawdown = DrawdownChartTab(self.trades)
         self.tab_equity = EquityChartTab(self.trades)
-        self.tab_options = OptionTab()
+        self.tab_options = OptionTab(self.trades)
         self.tab_optimization = OptimizationTab()
         self.tabs.resize(720,480)
         # Add tabs
@@ -443,7 +444,7 @@ class DetailWindow:
         self.__tab_optimization_loader()
 
         self.frame.show()
-    #load report tab
+    #load report tab <NONE>
     def __tab_report_loader__(self):
         _ = CustomIndex(self.trades)
         _ = Symbol(self.trades)
@@ -492,13 +493,13 @@ class DetailWindow:
         self.tab_report.add_new_index("Max Lose streak: ", max_los_streak.calculate())
         self.tab_report.add_new_index("Size required: ", size_require.calculate())
         self.tab_report.add_new_index("Avg monthly return: ", monthly_return.calculate())    
-    #load dd tab
+    #load dd tab <NONE>
     def __tab_drawdownChart_loader(self):
         pass
-    #load equity tab
+    #load equity tab <NONE>
     def __tab_equity_loader(self):
         pass
-    #Load Options tab
+    #Load Options tab <NONE>
     def __tab_options_loader(self):
         pass
     #Load Optimization tab
@@ -631,7 +632,7 @@ class DrawdownChartTab(QtWidgets.QTabWidget):
         sc.setParent(self)
 #Instanciate and manage the Options tab
 class OptionTab(QtWidgets.QTabWidget):
-    def __init__(self):
+    def __init__(self, _trade_list):
         #Calling super <Tab>
         super().__init__()
         #Content
@@ -648,6 +649,10 @@ class OptionTab(QtWidgets.QTabWidget):
         self.textbox_enddate = None
         #loading the UI
         self.__load_ui__()
+        #Load trades by values
+        self.trades = deepcopy(_trade_list)
+        #Load dates on textboxes
+        self.__load_dates__()
     #Load the Graphical Content
     def __load_ui__(self):
         spacing_left = 10
@@ -706,6 +711,7 @@ class OptionTab(QtWidgets.QTabWidget):
         #Setting checkbox
         self.checkbox_startdate.setChecked(True)
         self.checkbox_enddate.setChecked(True)
+
     #Enable and disable line based on checking - StartDate
     def on_start_date_checked(self):
         self.button_startdate.setEnabled(self.checkbox_startdate.isChecked())
@@ -714,6 +720,10 @@ class OptionTab(QtWidgets.QTabWidget):
     def on_end_date_checked(self):
         self.button_enddate.setEnabled(self.checkbox_startdate.isChecked())
         self.textbox_enddate.setEnabled(self.checkbox_startdate.isChecked())
+    #Load dates from list of trades
+    def __load_dates__(self):
+        self.textbox_startdate.setText(str(self.trades[0][4]))
+        self.textbox_enddate.setText(str(self.trades[-1][4]))
 #Instanciate and manage the Optimization tab
 class OptimizationTab(QtWidgets.QTabWidget):
     def __init__(self):
