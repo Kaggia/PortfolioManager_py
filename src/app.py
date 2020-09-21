@@ -5,6 +5,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from operator import itemgetter
 import os
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
@@ -377,15 +378,12 @@ class MainWindow:
                             modified_scaling = self.current_portfolio.scalings[ts.id-1]
                             multypling_factor = round(modified_scaling / actual_scaling, 2)
                             value = multypling_factor * trade[net_index]
-                            print("actual-> "+ str(actual_scaling) + " mod_scale-> " + str(modified_scaling) + " value-> " + str(value))
+                            #print("actual-> "+ str(actual_scaling) + " mod_scale-> " + str(modified_scaling) + " value-> " + str(value))
                             mod_trade.append(value)
                         else:
                             mod_trade.append(column)
                     unordered_list_of_trades.append(mod_trade)    
                     mod_trade = []
-            for trade in unordered_list_of_trades:
-                print(trade)
-                print("")
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
         else:
             #Load System by ID
@@ -413,7 +411,8 @@ class DetailWindow:
         self.trades = _unordered_list_of_trades
 
         self.__order_raw_trade_list__()
-        self.trades = self.__select_data_from__(_timeFilter)
+        self.df_trades = pd.DataFrame(self.trades, columns=["id", "name", "symbol", "volume", "close_time", "net"])
+        #self.trades = self.__select_data_from__(_timeFilter)
 
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
@@ -427,15 +426,21 @@ class DetailWindow:
         self.tab_report = ReportTab(2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
         self.tab_drawdown = DrawdownChartTab(self.trades)
         self.tab_equity = EquityChartTab(self.trades)
+        self.tab_options = OptionTab()
+        self.tab_optimization = OptimizationTab()
         self.tabs.resize(720,480)
         # Add tabs
-        self.tabs.addTab(self.tab_report,"Tab Report")
-        self.tabs.addTab(self.tab_drawdown,"Tab Drawdown")
-        self.tabs.addTab(self.tab_equity,"Tab Equity")
+        self.tabs.addTab(self.tab_options,"General options")
+        self.tabs.addTab(self.tab_report,"Report")
+        self.tabs.addTab(self.tab_drawdown,"Drawdown analysis")
+        self.tabs.addTab(self.tab_equity,"Equity analysis")
+        self.tabs.addTab(self.tab_optimization,"Optimization")
         #Load Tabs content
         self.__tab_report_loader__()
         self.__tab_equity_loader()
         self.__tab_drawdownChart_loader()
+        self.__tab_options_loader()
+        self.__tab_optimization_loader()
 
         self.frame.show()
     #load report tab
@@ -492,6 +497,12 @@ class DetailWindow:
         pass
     #load equity tab
     def __tab_equity_loader(self):
+        pass
+    #Load Options tab
+    def __tab_options_loader(self):
+        pass
+    #Load Optimization tab
+    def __tab_optimization_loader(self):
         pass
     #order tradelist passed
     def __order_raw_trade_list__(self):
@@ -618,6 +629,17 @@ class DrawdownChartTab(QtWidgets.QTabWidget):
         sc = MplCanvas(self, width=10, height=6, dpi=75, _yLabel="Drawdown", _xLabel="Index")
         sc.axes.bar(x_list_of_values, y_list_of_values, color='r') #xList, ylist
         sc.setParent(self)
+#Instanciate and manage the Options tab
+class OptionTab(QtWidgets.QTabWidget):
+    def __init__(self):
+        #Calling super <Tab>
+        super().__init__()
+        #GraphicalContent
+#Instanciate and manage the Optimization tab
+class OptimizationTab(QtWidgets.QTabWidget):
+    def __init__(self):
+        #Calling super <Tab>
+        super().__init__()
 #Canvas class to manage a chart
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100, _yLabel="", _xLabel=""):
