@@ -411,7 +411,7 @@ class DetailWindow:
         self.trades = _unordered_list_of_trades
 
         self.__order_raw_trade_list__()
-        self.df_trades = pd.DataFrame(self.trades, columns=["id", "name", "symbol", "volume", "close_time", "net"])
+        #self.df_trades = pd.DataFrame(self.trades, columns=["id", "name", "symbol", "volume", "close_time", "net"])
         #self.trades = self.__select_data_from__(_timeFilter)
 
         self.frame = QtWidgets.QMainWindow()
@@ -634,7 +634,86 @@ class OptionTab(QtWidgets.QTabWidget):
     def __init__(self):
         #Calling super <Tab>
         super().__init__()
-        #GraphicalContent
+        #Content
+        self.groupbox_date = None
+
+        self.date_option_label = None
+
+        self.checkbox_startdate = None
+        self.button_startdate = None
+        self.textbox_startdate = None
+
+        self.checkbox_enddate = None
+        self.button_enddate = None
+        self.textbox_enddate = None
+        #loading the UI
+        self.__load_ui__()
+    #Load the Graphical Content
+    def __load_ui__(self):
+        spacing_left = 10
+
+        self.groupbox_date = QtWidgets.QGroupBox(self)
+        self.groupbox_date.setGeometry(QtCore.QRect(0, 0, 175, 225))
+        gridLayout = QtWidgets.QGridLayout() 
+
+        #TextLabel
+        self.date_option_label = QtWidgets.QLabel(self)
+        self.date_option_label.setGeometry(QtCore.QRect(spacing_left, 25 , 150, 25))
+        self.date_option_label.setText("Date options: ")
+        #Group-StartDate-Checkbox
+        self.checkbox_startdate = QtWidgets.QCheckBox(self)
+        self.checkbox_startdate.setGeometry(QtCore.QRect(spacing_left, 50 , 100, 25))
+        self.checkbox_startdate.setText("Start date")
+        #Group-StartDate-threeDotButton
+        self.button_startdate = QtWidgets.QPushButton(self)
+        self.button_startdate.setGeometry(QtCore.QRect(spacing_left + 75, 55 , 50, 20))
+        self.button_startdate.setText("Pick from calendar")
+        #Group-StartDate-textbox
+        self.textbox_startdate = QtWidgets.QLineEdit(self)
+        self.textbox_startdate.setGeometry(QtCore.QRect(spacing_left + 150, 55 , 75, 20))
+        self.textbox_startdate.setText("dd/mm/YYYY")
+
+        #Group-EndDate-Checkbox
+        self.checkbox_enddate = QtWidgets.QCheckBox(self)
+        self.checkbox_enddate.setGeometry(QtCore.QRect(spacing_left, 75 , 100, 25))
+        self.checkbox_enddate.setText("Last date")
+        #Group-EndDate-threeDotButton
+        self.button_enddate = QtWidgets.QPushButton(self)
+        self.button_enddate.setGeometry(QtCore.QRect(spacing_left + 75, 80 , 50, 20))
+        self.button_enddate.setText("Pick from calendar")
+        #Group-EndDate-textbox
+        self.textbox_enddate = QtWidgets.QLineEdit(self)
+        self.textbox_enddate.setGeometry(QtCore.QRect(spacing_left + 150, 80 , 75, 20))
+        self.textbox_enddate.setText("dd/mm/YYYY")
+
+        gridLayout.addWidget(self.date_option_label)
+
+        gridLayout.addWidget(self.checkbox_startdate)
+        gridLayout.addWidget(self.button_startdate)
+        gridLayout.addWidget(self.textbox_startdate)
+
+        gridLayout.addWidget(self.checkbox_enddate)
+        gridLayout.addWidget(self.button_enddate)
+        gridLayout.addWidget(self.textbox_enddate)
+
+        self.groupbox_date.setLayout(gridLayout)
+        self.groupbox_date.show()
+
+        #Event Connection
+        self.checkbox_startdate.stateChanged.connect(self.on_start_date_checked)
+        self.checkbox_enddate.stateChanged.connect(self.on_end_date_checked)
+
+        #Setting checkbox
+        self.checkbox_startdate.setChecked(True)
+        self.checkbox_enddate.setChecked(True)
+    #Enable and disable line based on checking - StartDate
+    def on_start_date_checked(self):
+        self.button_startdate.setEnabled(self.checkbox_startdate.isChecked())
+        self.textbox_startdate.setEnabled(self.checkbox_startdate.isChecked())
+    #Enable and disable line based on checking - EndDate
+    def on_end_date_checked(self):
+        self.button_enddate.setEnabled(self.checkbox_startdate.isChecked())
+        self.textbox_enddate.setEnabled(self.checkbox_startdate.isChecked())
 #Instanciate and manage the Optimization tab
 class OptimizationTab(QtWidgets.QTabWidget):
     def __init__(self):
