@@ -16,6 +16,7 @@ import CONSTANTS as directory
 from os_interactors import FileManager
 from trading_system import TradingSystem
 from indexes import *
+from options import Option
 
 #Main window where you can manage the whole portfolio
 class MainWindow:
@@ -638,6 +639,8 @@ class OptionTab(QtWidgets.QTabWidget):
         super().__init__()
         #Trades
         self.trades = deepcopy(_trade_list)
+        #Options image
+        self.options_image = Option()
         #Content
         self.groupbox_date = None
 
@@ -658,12 +661,25 @@ class OptionTab(QtWidgets.QTabWidget):
         self.__load_ui__()
         #Load dates on textboxes
         self.__load_dates_on_textbox__()
+        #Load current options image
+        startDate = str(self.trades[0][4])
+        endDate = str(self.trades[-1][4])
+        startDate = startDate[:-6]
+        endDate = endDate[:-6]
+        #Set Default values and current values of Option obj
+        self.options_image.setValues(QtCore.QDate(int(startDate[-4:]), 
+                                                    int(startDate[3:5]),
+                                                        int(startDate[0:2])), 
+                                    QtCore.QDate(int(endDate[-4:]), 
+                                                    int(endDate[3:5]),
+                                                        int(endDate[0:2])),
+                                    'D')
     #Load the Graphical Content
     def __load_ui__(self):
         spacing_left = 10
 
         self.groupbox_date = QtWidgets.QGroupBox(self)
-        self.groupbox_date.setGeometry(QtCore.QRect(0, 0, 175, 325))
+        self.groupbox_date.setGeometry(QtCore.QRect(0, 0, 175, 400))
         gridLayout = QtWidgets.QGridLayout() 
 
         #TextLabel
@@ -722,6 +738,14 @@ class OptionTab(QtWidgets.QTabWidget):
         self.combobox_time_window.addItem('Weekly')
         self.combobox_time_window.addItem('Monthly')
         self.combobox_time_window.setCurrentIndex(0)
+        #ApplyButton
+        self.button_apply = QtWidgets.QPushButton(self)
+        self.button_apply.setGeometry(QtCore.QRect(spacing_left + 75, 150 , 50, 20))
+        self.button_apply.setText("Apply")
+        #ResetButton
+        self.button_reset = QtWidgets.QPushButton(self)
+        self.button_reset.setGeometry(QtCore.QRect(spacing_left + 125, 150 , 50, 20))
+        self.button_reset.setText("Reset")
 
         #Calendar
         self.cal_frame = QtWidgets.QMainWindow()
@@ -755,6 +779,9 @@ class OptionTab(QtWidgets.QTabWidget):
         gridLayout.addWidget(self.select_time_window)
         gridLayout.addWidget(self.combobox_time_window)
 
+        gridLayout.addWidget(self.button_apply)
+        gridLayout.addWidget(self.button_reset)
+
         self.groupbox_date.setLayout(gridLayout)
         self.groupbox_date.show()
 
@@ -763,6 +790,7 @@ class OptionTab(QtWidgets.QTabWidget):
         self.button_enddate.clicked.connect(self.__openCalendar_endDate__)
         self.checkbox_startdate.stateChanged.connect(self.__on_start_date_checked__)
         self.checkbox_enddate.stateChanged.connect(self.__on_end_date_checked__)
+        self.button_apply.clicked.connect(self.__apply_changes_to_options__)
 
         #Setting checkbox and radiobuttons
         self.checkbox_startdate.setChecked(True)
@@ -800,7 +828,6 @@ class OptionTab(QtWidgets.QTabWidget):
                                                    int(endDate[0:2])
                                             )
                                 )
-
     #Open the calendar - startDate
     def __openCalendar_startDate__(self):
         self.currentlySelectedCalendar = 0
@@ -809,6 +836,37 @@ class OptionTab(QtWidgets.QTabWidget):
     def __openCalendar_endDate__(self):
         self.currentlySelectedCalendar = 1
         self.cal_frame.show()
+    #Apply the current Gui state to Option Obj
+    #BUG <NON RIESCE A PASSARE I VALORI AL METODO>
+    def __apply_changes_to_options__(self): 
+        startdate = self.textbox_startdate.text()[:-6]
+        enddate = self.textbox_enddate.text()[:-6]
+        cbox_value = self.combobox_time_window.currentText()
+        time_window = None
+        if cbox_value == 'Default':
+            time_window = 'D'
+        elif cbox_value == 'Daily':
+            time_window = 'd'
+        elif cbox_value == 'Weekly':
+            time_window = 'w'
+        elif cbox_value == 'Monthly':
+            time_window = 'm'
+        
+        year_s = int(startdate[-4:])
+        month_s = int(startdate[3:5])
+        day_s = int(startdate[0:2])
+
+        year_e = int(enddate[-4:])
+        month_e = int(enddate[3:5])
+        day_e = int(enddate[0:2])
+
+        new_date_start = QtCore.QDate(year_s, month_s, day_s)
+        new_date_end = QtCore.QDate(year_e, month_e, day_e)
+        
+        self.options_image.setValues(new_date_start, new_date_end, time_window) 
+        print("Options saved:") 
+        print(new_date_start.toString())
+        print(new_date_end.toString())         
     #Get date from calendar widget
     def getDate(self):
       date = self.cal.selectedDate()
@@ -818,7 +876,6 @@ class OptionTab(QtWidgets.QTabWidget):
       else:
           self.textbox_enddate.setText(date_str)
       self.cal_frame.hide()
-
 #Instanciate and manage the Optimization tab
 class OptimizationTab(QtWidgets.QTabWidget):
     def __init__(self):

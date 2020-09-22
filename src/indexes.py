@@ -300,5 +300,3 @@ class MonthlyReturn(CustomIndex):
         
         value_to_return = round(sum_of_profits / months_elapsed, 2)
         return value_to_return
-            
-
