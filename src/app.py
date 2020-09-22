@@ -7,6 +7,7 @@ from copy import deepcopy
 import os
 import numpy as np
 import pandas as pd
+from copy import deepcopy
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
@@ -408,8 +409,8 @@ class MainWindow:
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades)) 
 #Window where various details are shown
 class DetailWindow:
-    def __init__(self, _unordered_list_of_trades, _timeFilter='01/01/2000 00:00'):
-        self.trades = _unordered_list_of_trades
+    def __init__(self, _unordered_list_of_trades):
+        self.trades = deepcopy(_unordered_list_of_trades)
 
         self.__order_raw_trade_list__()
         #self.df_trades = pd.DataFrame(self.trades, columns=["id", "name", "symbol", "volume", "close_time", "net"])
@@ -635,6 +636,8 @@ class OptionTab(QtWidgets.QTabWidget):
     def __init__(self, _trade_list):
         #Calling super <Tab>
         super().__init__()
+        #Trades
+        self.trades = deepcopy(_trade_list)
         #Content
         self.groupbox_date = None
 
@@ -647,18 +650,20 @@ class OptionTab(QtWidgets.QTabWidget):
         self.checkbox_enddate = None
         self.button_enddate = None
         self.textbox_enddate = None
+        #Attributes
+        self.startDate = None
+        self.endDate = None
+        self.currentlySelectedCalendar = None
         #loading the UI
         self.__load_ui__()
-        #Load trades by values
-        self.trades = deepcopy(_trade_list)
         #Load dates on textboxes
-        self.__load_dates__()
+        self.__load_dates_on_textbox__()
     #Load the Graphical Content
     def __load_ui__(self):
         spacing_left = 10
 
         self.groupbox_date = QtWidgets.QGroupBox(self)
-        self.groupbox_date.setGeometry(QtCore.QRect(0, 0, 175, 225))
+        self.groupbox_date.setGeometry(QtCore.QRect(0, 0, 175, 325))
         gridLayout = QtWidgets.QGridLayout() 
 
         #TextLabel
@@ -690,7 +695,46 @@ class OptionTab(QtWidgets.QTabWidget):
         self.textbox_enddate = QtWidgets.QLineEdit(self)
         self.textbox_enddate.setGeometry(QtCore.QRect(spacing_left + 150, 80 , 75, 20))
         self.textbox_enddate.setText("dd/mm/YYYY")
+        #Separator
+        self.separator_0 = QtWidgets.QLabel(self)
+        self.separator_0.setGeometry(QtCore.QRect(spacing_left, 90 , 150, 25))
+        self.separator_0.setText("_______________________")
+        #RadioButtons
+        self.radiobutton_custom_date = QtWidgets.QRadioButton(self)
+        self.radiobutton_custom_date.setGeometry(QtCore.QRect(spacing_left + 150, 100 , 75, 20))
+        self.radiobutton_custom_date.setText("Custom date filter")
+        self.radiobutton_real_money_gain = QtWidgets.QRadioButton(self)
+        self.radiobutton_real_money_gain.setGeometry(QtCore.QRect(spacing_left + 150, 110 , 75, 20))
+        self.radiobutton_real_money_gain.setText("Real money gain filter")
+        #Separator
+        self.separator_1 = QtWidgets.QLabel(self)
+        self.separator_1.setGeometry(QtCore.QRect(spacing_left, 120 , 150, 25))
+        self.separator_1.setText("_______________________")
+        #TextLabel
+        self.select_time_window = QtWidgets.QLabel(self)
+        self.select_time_window.setGeometry(QtCore.QRect(spacing_left, 130 , 150, 25))
+        self.select_time_window.setText("Select Window time: ")
+        #Combobox
+        self.combobox_time_window = QtWidgets.QComboBox(self)
+        self.combobox_time_window.setGeometry(QtCore.QRect(spacing_left, 140 , 150, 25))
+        self.combobox_time_window.addItem('Default')
+        self.combobox_time_window.addItem('Daily')
+        self.combobox_time_window.addItem('Weekly')
+        self.combobox_time_window.addItem('Monthly')
+        self.combobox_time_window.setCurrentIndex(0)
 
+        #Calendar
+        self.cal_frame = QtWidgets.QMainWindow()
+        self.cal_frame.resize(325, 325)
+        self.cal_frame.setWindowTitle("Calendar: Pick a day")
+        self.cal_frame.setMinimumSize(QtCore.QSize(325, 305))
+        self.cal_frame.setMaximumSize(QtCore.QSize(325, 305)) 
+        self.cal = QtWidgets.QCalendarWidget(self.cal_frame)
+        self.cal.setGeometry(0,0,325,300)
+        self.cal.setGridVisible(False)
+        self.__setMinAndMaxDateOnCalendar__()
+        self.cal.clicked[QtCore.QDate].connect(self.getDate)
+            
         gridLayout.addWidget(self.date_option_label)
 
         gridLayout.addWidget(self.checkbox_startdate)
@@ -701,29 +745,80 @@ class OptionTab(QtWidgets.QTabWidget):
         gridLayout.addWidget(self.button_enddate)
         gridLayout.addWidget(self.textbox_enddate)
 
+        gridLayout.addWidget(self.separator_0)
+
+        gridLayout.addWidget(self.radiobutton_custom_date)
+        gridLayout.addWidget(self.radiobutton_real_money_gain)
+
+        gridLayout.addWidget(self.separator_1)
+
+        gridLayout.addWidget(self.select_time_window)
+        gridLayout.addWidget(self.combobox_time_window)
+
         self.groupbox_date.setLayout(gridLayout)
         self.groupbox_date.show()
 
         #Event Connection
-        self.checkbox_startdate.stateChanged.connect(self.on_start_date_checked)
-        self.checkbox_enddate.stateChanged.connect(self.on_end_date_checked)
+        self.button_startdate.clicked.connect(self.__openCalendar_startDate__)
+        self.button_enddate.clicked.connect(self.__openCalendar_endDate__)
+        self.checkbox_startdate.stateChanged.connect(self.__on_start_date_checked__)
+        self.checkbox_enddate.stateChanged.connect(self.__on_end_date_checked__)
 
-        #Setting checkbox
+        #Setting checkbox and radiobuttons
         self.checkbox_startdate.setChecked(True)
         self.checkbox_enddate.setChecked(True)
-
+        self.radiobutton_custom_date.setChecked(True)
+        self.radiobutton_real_money_gain.setChecked(False)
     #Enable and disable line based on checking - StartDate
-    def on_start_date_checked(self):
+    def __on_start_date_checked__(self):
         self.button_startdate.setEnabled(self.checkbox_startdate.isChecked())
         self.textbox_startdate.setEnabled(self.checkbox_startdate.isChecked())
+        self.radiobutton_custom_date.setChecked(True)
     #Enable and disable line based on checking - EndDate
-    def on_end_date_checked(self):
-        self.button_enddate.setEnabled(self.checkbox_startdate.isChecked())
-        self.textbox_enddate.setEnabled(self.checkbox_startdate.isChecked())
+    def __on_end_date_checked__(self):
+        self.button_enddate.setEnabled(self.checkbox_enddate.isChecked())
+        self.textbox_enddate.setEnabled(self.checkbox_enddate.isChecked())
+        self.radiobutton_custom_date.setChecked(True)
     #Load dates from list of trades
-    def __load_dates__(self):
+    def __load_dates_on_textbox__(self):
         self.textbox_startdate.setText(str(self.trades[0][4]))
         self.textbox_enddate.setText(str(self.trades[-1][4]))
+        #Open the calendar - startDate
+    #Set Min and Max date on calendar
+    def __setMinAndMaxDateOnCalendar__(self):
+        startDate = str(self.trades[0][4])
+        endDate = str(self.trades[-1][4])
+        startDate = startDate[:-6]
+        endDate = endDate[:-6]
+        self.cal.setMinimumDate(QtCore.QDate(int(startDate[-4:]), 
+                                                int(startDate[3:5]),
+                                                   int(startDate[0:2])
+                                            )
+                                )
+        self.cal.setMaximumDate(QtCore.QDate(int(endDate[-4:]), 
+                                                int(endDate[3:5]),
+                                                   int(endDate[0:2])
+                                            )
+                                )
+
+    #Open the calendar - startDate
+    def __openCalendar_startDate__(self):
+        self.currentlySelectedCalendar = 0
+        self.cal_frame.show()
+    #Open the calendar - endDate
+    def __openCalendar_endDate__(self):
+        self.currentlySelectedCalendar = 1
+        self.cal_frame.show()
+    #Get date from calendar widget
+    def getDate(self):
+      date = self.cal.selectedDate()
+      date_str = str(date.month()) + "/" + str(date.day()) + "/" + str(date.year()) + " 00:00"
+      if (self.currentlySelectedCalendar == 0):
+          self.textbox_startdate.setText(date_str)
+      else:
+          self.textbox_enddate.setText(date_str)
+      self.cal_frame.hide()
+
 #Instanciate and manage the Optimization tab
 class OptimizationTab(QtWidgets.QTabWidget):
     def __init__(self):
