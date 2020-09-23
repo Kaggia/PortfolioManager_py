@@ -17,6 +17,7 @@ from os_interactors import FileManager
 from trading_system import TradingSystem
 from indexes import *
 from options import Option
+from date import Date
 
 #Main window where you can manage the whole portfolio
 class MainWindow:
@@ -667,12 +668,8 @@ class OptionTab(QtWidgets.QTabWidget):
         startDate = startDate[:-6]
         endDate = endDate[:-6]
         #Set Default values and current values of Option obj
-        self.options_image.setValues(QtCore.QDate(int(startDate[-4:]), 
-                                                    int(startDate[3:5]),
-                                                        int(startDate[0:2])), 
-                                    QtCore.QDate(int(endDate[-4:]), 
-                                                    int(endDate[3:5]),
-                                                        int(endDate[0:2])),
+        self.options_image.setValues(Date(int(startDate[3:5]), int(startDate[0:2]), int(startDate[-4:])), 
+                                    Date(int(endDate[3:5]), int(endDate[0:2]), int(endDate[-4:])),
                                     'D')
     #Load the Graphical Content
     def __load_ui__(self):
@@ -860,13 +857,11 @@ class OptionTab(QtWidgets.QTabWidget):
         month_e = int(enddate[3:5])
         day_e = int(enddate[0:2])
 
-        new_date_start = QtCore.QDate(year_s, month_s, day_s)
-        new_date_end = QtCore.QDate(year_e, month_e, day_e)
+        new_date_start = Date(month_s, day_s, year_s)
+        new_date_end = Date(month_e, day_e, year_e)
         
         self.options_image.setValues(new_date_start, new_date_end, time_window) 
-        print("Options saved:") 
-        print(new_date_start.toString())
-        print(new_date_end.toString())         
+        
     #Get date from calendar widget
     def getDate(self):
       date = self.cal.selectedDate()
