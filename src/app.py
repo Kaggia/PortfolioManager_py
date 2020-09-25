@@ -440,8 +440,6 @@ class DetailWindow:
         self.tabs.addTab(self.tab_equity,"Equity analysis")
         self.tabs.addTab(self.tab_optimization,"Optimization")
 
-        print("Tab is index: ", self.tabs.indexOf(self.tab_report))
-        self.tabs.removeTab(self.tabs.indexOf(self.tab_report))
         #Load Tabs content
         self.__tab_report_loader__()
         self.__tab_equity_loader()
@@ -450,6 +448,7 @@ class DetailWindow:
         self.__tab_optimization_loader()
 
         self.frame.show()
+        
     #load report tab 
     def __tab_report_loader__(self):
         _ = CustomIndex(self.trades)
@@ -574,6 +573,16 @@ class DetailWindow:
             if (current_internal_date >= starting_date_as_value) and (current_internal_date <= ending_date_as_value) :
                 trades_to_return.append(trade)
         #Filtering by time window
+        
+        if _options.time_window == 'D':
+            pass
+        elif _options.time_window == 'd':
+            pass
+        elif _options.time_window == 'w':
+            pass
+        elif _options.time_window == 'm':
+            pass
+
         #IMPLEMENT
 
         return trades_to_return
@@ -798,6 +807,7 @@ class OptionTab(QtWidgets.QTabWidget):
         self.combobox_time_window.addItem('Weekly')
         self.combobox_time_window.addItem('Monthly')
         self.combobox_time_window.setCurrentIndex(0)
+
         #ApplyButton
         self.button_apply = QtWidgets.QPushButton(self)
         self.button_apply.setGeometry(QtCore.QRect(spacing_left + 75, 150 , 50, 20))
@@ -851,12 +861,17 @@ class OptionTab(QtWidgets.QTabWidget):
         self.checkbox_startdate.stateChanged.connect(self.__on_start_date_checked__)
         self.checkbox_enddate.stateChanged.connect(self.__on_end_date_checked__)
         self.button_apply.clicked.connect(self.__apply_changes_to_options__)
+        self.button_reset.clicked.connect(self.__reset_changes_to_options__)
 
         #Setting checkbox and radiobuttons
         self.checkbox_startdate.setChecked(True)
         self.checkbox_enddate.setChecked(True)
         self.radiobutton_custom_date.setChecked(True)
         self.radiobutton_real_money_gain.setChecked(False)
+
+        #Momentaneous disabling
+        self.radiobutton_real_money_gain.setEnabled(False)
+        self.combobox_time_window.setEnabled(False)
     #Enable and disable line based on checking - StartDate
     def __on_start_date_checked__(self):
         self.button_startdate.setEnabled(self.checkbox_startdate.isChecked())
@@ -925,6 +940,12 @@ class OptionTab(QtWidgets.QTabWidget):
         self.options_image.setValues(new_date_start, new_date_end, time_window) 
         #Change list of trades
         self.cw.reload_tabs(self.options_image)       
+    #Reset the current Gui state to Option Obj
+    def __reset_changes_to_options__(self):
+         #load new values 
+        self.options_image.setValues(self.options_image.startDate_d, self.options_image.endDate_d, self.options_image.time_window_d) 
+        #Change list of trades
+        self.cw.reload_tabs(self.options_image)   
     #Get date from calendar widget
     def getDate(self):
       date = self.cal.selectedDate()
