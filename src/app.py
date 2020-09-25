@@ -412,9 +412,11 @@ class MainWindow:
 #Window where various details are shown
 class DetailWindow:
     def __init__(self, _unordered_list_of_trades):
+        self.trades_default = deepcopy(_unordered_list_of_trades)
         self.trades = deepcopy(_unordered_list_of_trades)
 
-        self.__order_raw_trade_list__()
+        self.__order_raw_trade_list__(self.trades_default)
+        self.__order_raw_trade_list__(self.trades)
         #self.df_trades = pd.DataFrame(self.trades, columns=["id", "name", "symbol", "volume", "close_time", "net"])
         #self.trades = self.__select_data_from__(_timeFilter)
 
@@ -430,7 +432,7 @@ class DetailWindow:
         self.tab_report = ReportTab(2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
         self.tab_drawdown = DrawdownChartTab(self.trades)
         self.tab_equity = EquityChartTab(self.trades)
-        self.tab_options = OptionTab(self.trades)
+        self.tab_options = OptionTab(self.trades, self)
         self.tab_optimization = OptimizationTab()
         self.tabs.resize(720,480)
         # Add tabs
@@ -439,6 +441,9 @@ class DetailWindow:
         self.tabs.addTab(self.tab_drawdown,"Drawdown analysis")
         self.tabs.addTab(self.tab_equity,"Equity analysis")
         self.tabs.addTab(self.tab_optimization,"Optimization")
+
+        print("Tab is index: ", self.tabs.indexOf(self.tab_report))
+        self.tabs.removeTab(self.tabs.indexOf(self.tab_report))
         #Load Tabs content
         self.__tab_report_loader__()
         self.__tab_equity_loader()
@@ -447,7 +452,7 @@ class DetailWindow:
         self.__tab_optimization_loader()
 
         self.frame.show()
-    #load report tab <NONE>
+    #load report tab 
     def __tab_report_loader__(self):
         _ = CustomIndex(self.trades)
         _ = Symbol(self.trades)
@@ -509,10 +514,10 @@ class DetailWindow:
     def __tab_optimization_loader(self):
         pass
     #order tradelist passed
-    def __order_raw_trade_list__(self):
+    def __order_raw_trade_list__(self, listoftrades):
         #index_of_date = 0
         #Get the ID of column with dates_format
-        for trade in self.trades:
+        for trade in listoftrades:
             for column in trade:
                 if len(str(column)) == 16:
                     if (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
@@ -551,6 +556,50 @@ class DetailWindow:
         sum_of_minutes = day_value + month_value + year_value + hour_value + minute_value
 
         return sum_of_minutes
+    #Filter trades
+    def filter_trades_by_option (self, _options):
+        new_trades = deepcopy(self.trades)
+        trades_to_return = []
+        #GetStartingDateAsValue
+        starting_date_as_value = self.__convert_date_to_internalDate__(_options.startDate.m, _options.startDate.d, _options.startDate.y, 0, 0)
+        #GetEndingDateAsValue
+        ending_date_as_value = self.__convert_date_to_internalDate__(_options.endDate.m, _options.endDate.d, _options.endDate.y, 0, 0)
+        time_window = _options.time_window
+         
+        #Filtering by time window
+        
+        return new_trades
+    #Reloading the tabs 
+    def reload_tabs(self, _options):
+        #Load trades by options
+        filtered_trades_list = self.filter_trades_by_option(_options)
+        #Reload all tabs by removing them and calling them back again
+        #<REMOVING>
+        self.tabs.removeTab(self.tabs.indexOf(self.tab_options))
+        self.tabs.removeTab(self.tabs.indexOf(self.tab_report))
+        self.tabs.removeTab(self.tabs.indexOf(self.tab_drawdown))
+        self.tabs.removeTab(self.tabs.indexOf(self.tab_optimization))
+        self.tabs.removeTab(self.tabs.indexOf(self.tab_equity))
+        
+        #<ADDING>
+        self.tab_report = ReportTab(2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
+        self.tab_drawdown = DrawdownChartTab(filtered_trades_list)
+        self.tab_equity = EquityChartTab(filtered_trades_list)
+        self.tab_options = OptionTab(filtered_trades_list, self)
+        self.tab_optimization = OptimizationTab()
+
+        self.tabs.addTab(self.tab_options,"General options")
+        self.tabs.addTab(self.tab_report,"Report")
+        self.tabs.addTab(self.tab_drawdown,"Drawdown analysis")
+        self.tabs.addTab(self.tab_equity,"Equity analysis")
+        self.tabs.addTab(self.tab_optimization,"Optimization")
+
+        #Load Tabs content
+        self.__tab_report_loader__()
+        self.__tab_equity_loader()
+        self.__tab_drawdownChart_loader()
+        self.__tab_options_loader()
+        self.__tab_optimization_loader()
 #Instanciate and manage the report tab, printing all indexes
 class ReportTab(QtWidgets.QTabWidget):
     def __init__(self,_columns, _rows, _spacingX, _spacingY):
@@ -635,13 +684,15 @@ class DrawdownChartTab(QtWidgets.QTabWidget):
         sc.setParent(self)
 #Instanciate and manage the Options tab
 class OptionTab(QtWidgets.QTabWidget):
-    def __init__(self, _trade_list):
+    def __init__(self, _trade_list, _current_window):
         #Calling super <Tab>
         super().__init__()
         #Trades
         self.trades = deepcopy(_trade_list)
         #Options image
         self.options_image = Option()
+        #Get the current secondary window
+        self.cw = _current_window
         #Content
         self.groupbox_date = None
 
@@ -834,7 +885,6 @@ class OptionTab(QtWidgets.QTabWidget):
         self.currentlySelectedCalendar = 1
         self.cal_frame.show()
     #Apply the current Gui state to Option Obj
-    #BUG <NON RIESCE A PASSARE I VALORI AL METODO>
     def __apply_changes_to_options__(self): 
         startdate = self.textbox_startdate.text()[:-6]
         enddate = self.textbox_enddate.text()[:-6]
@@ -859,9 +909,10 @@ class OptionTab(QtWidgets.QTabWidget):
 
         new_date_start = Date(month_s, day_s, year_s)
         new_date_end = Date(month_e, day_e, year_e)
-        
+        #load new values 
         self.options_image.setValues(new_date_start, new_date_end, time_window) 
-        
+        #Change list of trades
+        self.cw.reload_tabs(self.options_image)       
     #Get date from calendar widget
     def getDate(self):
       date = self.cal.selectedDate()
