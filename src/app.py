@@ -447,8 +447,7 @@ class DetailWindow:
         self.__tab_options_loader()
         self.__tab_optimization_loader()
 
-        self.frame.show()
-        
+        self.frame.show()      
     #load report tab 
     def __tab_report_loader__(self):
         _ = CustomIndex(self.trades)
