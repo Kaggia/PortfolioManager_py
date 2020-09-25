@@ -417,8 +417,6 @@ class DetailWindow:
 
         self.__order_raw_trade_list__(self.trades_default)
         self.__order_raw_trade_list__(self.trades)
-        #self.df_trades = pd.DataFrame(self.trades, columns=["id", "name", "symbol", "volume", "close_time", "net"])
-        #self.trades = self.__select_data_from__(_timeFilter)
 
         self.frame = QtWidgets.QMainWindow()
         self.frame.resize(720, 480)
@@ -537,15 +535,6 @@ class DetailWindow:
         
         #fm = FileManager()
         #fm.dump_list_of_list("dump.txt", self.trades)      
-    #selects data from the date specifiend on
-    def __select_data_from__(self, _timeFilter):
-        internal_date = self.__convert_date_to_internalDate__(_timeFilter[0:2], _timeFilter[3:5], _timeFilter[6:11], _timeFilter[11:13], _timeFilter[14:])
-        selected_trades_to_show = []
-        for trade in self.trades:
-            if trade[-1] >= internal_date:
-                selected_trades_to_show.append(trade)
-
-        return selected_trades_to_show
     #convert a date(string) to a internalDate Value, letting the list be ordered
     def __convert_date_to_internalDate__(self, _month, _day, _year, _hour, _minute):
         day_value = (int(_day) - 1 ) * 1440
@@ -556,6 +545,18 @@ class DetailWindow:
         sum_of_minutes = day_value + month_value + year_value + hour_value + minute_value
 
         return sum_of_minutes
+    #Get Index of date-column
+    def __get_index_of_date_column__(self):
+        single_trade = self.trades[0]
+        index = -1
+        i = 0
+        for column in single_trade:
+            if len(str(column)) == 16 and (column[2] == "/") and (column[5] == "/") and (column[13] == ":") :
+                index = i
+                break
+            else:
+                i += 1
+        return index
     #Filter trades
     def filter_trades_by_option (self, _options):
         new_trades = deepcopy(self.trades)
@@ -565,10 +566,20 @@ class DetailWindow:
         #GetEndingDateAsValue
         ending_date_as_value = self.__convert_date_to_internalDate__(_options.endDate.m, _options.endDate.d, _options.endDate.y, 0, 0)
         time_window = _options.time_window
-         
+        #Filtering by Start and end date
+        index_of_date_column = self.__get_index_of_date_column__()
+
+        for trade in new_trades:
+            current_internal_date = self.__convert_date_to_internalDate__(trade[index_of_date_column][0:2], trade[index_of_date_column][3:5], trade[index_of_date_column][6:11], trade[index_of_date_column][11:13], trade[index_of_date_column][14:])
+            if (current_internal_date >= starting_date_as_value) and (current_internal_date <= ending_date_as_value) :
+                trades_to_return.append(trade)
+
+        print("Original trades had: ", len(new_trades))
+        print("New trades had: ", len(trades_to_return))
         #Filtering by time window
-        
-        return new_trades
+        #IMPLEMENT
+
+        return trades_to_return
     #Reloading the tabs 
     def reload_tabs(self, _options):
         #Load trades by options
@@ -898,14 +909,14 @@ class OptionTab(QtWidgets.QTabWidget):
             time_window = 'w'
         elif cbox_value == 'Monthly':
             time_window = 'm'
-        
-        year_s = int(startdate[-4:])
-        month_s = int(startdate[3:5])
-        day_s = int(startdate[0:2])
 
-        year_e = int(enddate[-4:])
-        month_e = int(enddate[3:5])
-        day_e = int(enddate[0:2])
+        year_s = int(startdate[-4:].replace("/", ""))
+        month_s = int(startdate[3:5].replace("/", ""))
+        day_s = int(startdate[0:2].replace("/", ""))
+
+        year_e = int(enddate[-4:].replace("/", ""))
+        month_e = int(enddate[3:5].replace("/", ""))
+        day_e = int(enddate[0:2].replace("/", ""))
 
         new_date_start = Date(month_s, day_s, year_s)
         new_date_end = Date(month_e, day_e, year_e)

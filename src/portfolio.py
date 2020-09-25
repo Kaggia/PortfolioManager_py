@@ -44,3 +44,4 @@ class Portfolio:
             self.scalings.append(ts.volume)
         print("INFO: Scaling list is: ")
         print(self.scalings)
+    
