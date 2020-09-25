@@ -756,6 +756,7 @@ class OptionTab(QtWidgets.QTabWidget):
         self.textbox_startdate = QtWidgets.QLineEdit(self)
         self.textbox_startdate.setGeometry(QtCore.QRect(spacing_left + 150, 55 , 75, 20))
         self.textbox_startdate.setText("dd/mm/YYYY")
+        self.textbox_startdate.setReadOnly(True)
 
         #Group-EndDate-Checkbox
         self.checkbox_enddate = QtWidgets.QCheckBox(self)
@@ -769,6 +770,7 @@ class OptionTab(QtWidgets.QTabWidget):
         self.textbox_enddate = QtWidgets.QLineEdit(self)
         self.textbox_enddate.setGeometry(QtCore.QRect(spacing_left + 150, 80 , 75, 20))
         self.textbox_enddate.setText("dd/mm/YYYY")
+        self.textbox_enddate.setReadOnly(True)
         #Separator
         self.separator_0 = QtWidgets.QLabel(self)
         self.separator_0.setGeometry(QtCore.QRect(spacing_left, 90 , 150, 25))
@@ -926,10 +928,11 @@ class OptionTab(QtWidgets.QTabWidget):
     #Get date from calendar widget
     def getDate(self):
       date = self.cal.selectedDate()
-      date_str = str(date.month()) + "/" + str(date.day()) + "/" + str(date.year()) + " 00:00"
       if (self.currentlySelectedCalendar == 0):
+          date_str = str(date.month()) + "/" + str(date.day()) + "/" + str(date.year()) + " 00:00"
           self.textbox_startdate.setText(date_str)
       else:
+          date_str = str(date.month()) + "/" + str(date.day()) + "/" + str(date.year()) + " 23:59"
           self.textbox_enddate.setText(date_str)
       self.cal_frame.hide()
 #Instanciate and manage the Optimization tab
