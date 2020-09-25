@@ -564,7 +564,7 @@ class DetailWindow:
         #GetStartingDateAsValue
         starting_date_as_value = self.__convert_date_to_internalDate__(_options.startDate.m, _options.startDate.d, _options.startDate.y, 0, 0)
         #GetEndingDateAsValue
-        ending_date_as_value = self.__convert_date_to_internalDate__(_options.endDate.m, _options.endDate.d, _options.endDate.y, 0, 0)
+        ending_date_as_value = self.__convert_date_to_internalDate__(_options.endDate.m, _options.endDate.d, _options.endDate.y, 23, 59)
         time_window = _options.time_window
         #Filtering by Start and end date
         index_of_date_column = self.__get_index_of_date_column__()
@@ -573,9 +573,6 @@ class DetailWindow:
             current_internal_date = self.__convert_date_to_internalDate__(trade[index_of_date_column][0:2], trade[index_of_date_column][3:5], trade[index_of_date_column][6:11], trade[index_of_date_column][11:13], trade[index_of_date_column][14:])
             if (current_internal_date >= starting_date_as_value) and (current_internal_date <= ending_date_as_value) :
                 trades_to_return.append(trade)
-
-        print("Original trades had: ", len(new_trades))
-        print("New trades had: ", len(trades_to_return))
         #Filtering by time window
         #IMPLEMENT
 
@@ -584,6 +581,8 @@ class DetailWindow:
     def reload_tabs(self, _options):
         #Load trades by options
         filtered_trades_list = self.filter_trades_by_option(_options)
+        for trade in filtered_trades_list:
+            print(trade)
         #Reload all tabs by removing them and calling them back again
         #<REMOVING>
         self.tabs.removeTab(self.tabs.indexOf(self.tab_options))
