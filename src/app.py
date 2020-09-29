@@ -578,7 +578,9 @@ class DetailWindow:
         #Filtering by time window
         
         if _options.time_window == 'D':
-            pass
+            filtered_list_of_trades = []
+            for trade in trades_to_return:
+                filtered_list_of_trades.append(trade)
 
         elif _options.time_window == 'd':
             print("Daily filtering options algo")
@@ -600,19 +602,73 @@ class DetailWindow:
                     day = []
                     day.append(trade)
                     last_date_of_trade_as_value = self.__convert_date_to_internalDate__(current_date[0:2], current_date[3:5], current_date[6:11], 0, 0)
+
+            #Merging data from the same time interval
+            filtered_list_of_trades = []
+            index = 0
+            name = trades_to_return[0][1]
+            symbol = trades_to_return[0][2]
+            volume = trades_to_return[0][3]
+            closing_date =  None
+            net_cumulative = 0
             for day_c in list_to_sum:
                 for d in day_c:
-                    print(d)
-                    print("")
-                print("-----new day-------")
+                    net_cumulative = net_cumulative + d[-2]
+                    closing_date = d[-3][:-6] + " 00:00"
+                    name = d[1]
+                    symbol = d[2]
+                    volume = d[3]
+                filtered_list_of_trades.append([index, name, symbol, volume, closing_date, float(net_cumulative), 0])
+                net_cumulative = 0
+                index += 1
+
         elif _options.time_window == 'w':
             pass
         elif _options.time_window == 'm':
-            pass
+            print("Monthly filtering options algo")
+            list_to_sum = []
+            month = []
+            DIFF_MONTH = self.__convert_date_to_internalDate__(2, 1, 2001, 0, 0) - self.__convert_date_to_internalDate__(1, 1, 2001, 0, 0)
+            last_date_of_trade_as_value = self.__convert_date_to_internalDate__(trades_to_return[0][index_of_date_column][0:2], 1, trades_to_return[0][index_of_date_column][6:11], 0, 0)
+            print("DIFF_MONTH: ", DIFF_MONTH)
+            for trade in trades_to_return:
+                current_date = trade[index_of_date_column]
+                current_date_as_value = self.__convert_date_to_internalDate__(current_date[0:2], current_date[3:5], current_date[6:11], current_date[11:13], current_date[14:])
+                if (current_date_as_value - last_date_of_trade_as_value) <= DIFF_MONTH:
+                    print("Differenza tra due trade date<intraday>: ", str(current_date_as_value - last_date_of_trade_as_value))
+                    month.append(trade)
+                    last_date_of_trade_as_value = self.__convert_date_to_internalDate__(current_date[0:2], 1, current_date[6:11], 0, 0)
+                else:
+                    print("Differenza tra due trade date<out of a day>: ", str(current_date_as_value - last_date_of_trade_as_value))
+                    list_to_sum.append(month)
+                    month = []
+                    month.append(trade)
+                    last_date_of_trade_as_value = self.__convert_date_to_internalDate__(current_date[0:2], 1, current_date[6:11], 0, 0)
+
+            #Merging data from the same time interval
+            filtered_list_of_trades = []
+            index = 0
+            name = trades_to_return[0][1]
+            symbol = trades_to_return[0][2]
+            volume = trades_to_return[0][3]
+            closing_date =  None
+            net_cumulative = 0
+            for month_c in list_to_sum:
+                for m in month_c:
+                    net_cumulative = net_cumulative + m[-2]
+                    closing_date = m[index_of_date_column][0:2] + "/" + m[index_of_date_column][6:-6] + " 00:00"
+                    name = m[1]
+                    symbol = m[2]
+                    volume = m[3]
+                filtered_list_of_trades.append([index, name, symbol, volume, closing_date, float(net_cumulative), 0])
+                net_cumulative = 0
+                index += 1
 
         #IMPLEMENT
+        for trade in filtered_list_of_trades:
+            print(trade)
 
-        return trades_to_return
+        return filtered_list_of_trades
     #Reloading the tabs 
     def reload_tabs(self, _options):
         #Load trades by options
