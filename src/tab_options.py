@@ -5,7 +5,7 @@ from date import Date
 
 #Instanciate and manage the Options tab
 class OptionTab(QtWidgets.QTabWidget):
-    def __init__(self, _trade_list, _current_window):
+    def __init__(self, _trade_list,_current_window):
         #Calling super <Tab>
         super().__init__()
         #Trades
@@ -173,7 +173,7 @@ class OptionTab(QtWidgets.QTabWidget):
 
         #Momentaneous disabling
         self.radiobutton_real_money_gain.setEnabled(False)
-        self.combobox_time_window.setEnabled(False)
+        self.combobox_time_window.setEnabled(True)
     #Enable and disable line based on checking - StartDate
     def __on_start_date_checked__(self):
         self.button_startdate.setEnabled(self.checkbox_startdate.isChecked())
@@ -258,3 +258,18 @@ class OptionTab(QtWidgets.QTabWidget):
           date_str = str(date.month()) + "/" + str(date.day()) + "/" + str(date.year()) + " 23:59"
           self.textbox_enddate.setText(date_str)
       self.cal_frame.hide()
+    #Load a particular state of GUI by specifying the options
+    def load_state(self, _options):
+        print("Loading previous state of options")
+        self.textbox_startdate.setText(str(_options.startDate.m) + "/" + str(_options.startDate.d) + "/" + str(_options.startDate.y) + " 00:00" )
+        self.textbox_enddate.setText(str(_options.endDate.m) + "/" + str(_options.endDate.d) + "/" + str(_options.endDate.y) + " 23:59")
+        if _options.time_window == 'D':
+            self.combobox_time_window.setCurrentIndex(self.combobox_time_window.findText('Default'))
+        elif _options.time_window == 'd':
+            self.combobox_time_window.setCurrentIndex(self.combobox_time_window.findText('Daily'))  
+        elif _options.time_window == 'm':
+            self.combobox_time_window.setCurrentIndex(self.combobox_time_window.findText('Monthly'))
+        elif _options.time_window == 'w':
+            self.combobox_time_window.setCurrentIndex(self.combobox_time_window.findText('Weekly'))
+
+

@@ -579,8 +579,32 @@ class DetailWindow:
         
         if _options.time_window == 'D':
             pass
+
         elif _options.time_window == 'd':
-            pass
+            print("Daily filtering options algo")
+            list_to_sum = []
+            day = []
+            DIFF_DAY = self.__convert_date_to_internalDate__(1, 2, 2001, 0, 0) - self.__convert_date_to_internalDate__(1, 1, 2001, 0, 0)
+            last_date_of_trade_as_value = self.__convert_date_to_internalDate__(trades_to_return[0][index_of_date_column][0:2], trades_to_return[0][index_of_date_column][3:5], trades_to_return[0][index_of_date_column][6:11], 0, 0)
+            print("DIFF_DAY: ", DIFF_DAY)
+            for trade in trades_to_return:
+                current_date = trade[index_of_date_column]
+                current_date_as_value = self.__convert_date_to_internalDate__(current_date[0:2], current_date[3:5], current_date[6:11], current_date[11:13], current_date[14:])
+                if (current_date_as_value - last_date_of_trade_as_value) <= DIFF_DAY:
+                    print("Differenza tra due trade date<intraday>: ", str(current_date_as_value - last_date_of_trade_as_value))
+                    day.append(trade)
+                    last_date_of_trade_as_value = self.__convert_date_to_internalDate__(current_date[0:2], current_date[3:5], current_date[6:11], 0, 0)
+                else:
+                    print("Differenza tra due trade date<out of a day>: ", str(current_date_as_value - last_date_of_trade_as_value))
+                    list_to_sum.append(day)
+                    day = []
+                    day.append(trade)
+                    last_date_of_trade_as_value = self.__convert_date_to_internalDate__(current_date[0:2], current_date[3:5], current_date[6:11], 0, 0)
+            for day_c in list_to_sum:
+                for d in day_c:
+                    print(d)
+                    print("")
+                print("-----new day-------")
         elif _options.time_window == 'w':
             pass
         elif _options.time_window == 'm':
@@ -593,8 +617,8 @@ class DetailWindow:
     def reload_tabs(self, _options):
         #Load trades by options
         filtered_trades_list = self.filter_trades_by_option(_options)
-        for trade in filtered_trades_list:
-            print(trade)
+        #for trade in filtered_trades_list:
+        #    print(trade)
         #Reload all tabs by removing them and calling them back again
         #<REMOVING>
         self.tabs.removeTab(self.tabs.indexOf(self.tab_options))
@@ -608,6 +632,7 @@ class DetailWindow:
         self.tab_drawdown = DrawdownChartTab(filtered_trades_list)
         self.tab_equity = EquityChartTab(filtered_trades_list)
         self.tab_options = OptionTab(filtered_trades_list, self)
+        self.tab_options.load_state(_options)
         self.tab_optimization = OptimizationTab()
 
         self.tabs.addTab(self.tab_options,"General options")
