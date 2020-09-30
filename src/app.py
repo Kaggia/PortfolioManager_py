@@ -17,6 +17,7 @@ from trading_system import TradingSystem
 from indexes import *
 from options import Option
 from date import Date
+from date import reset_to_monday
 from tab_equity import EquityChartTab
 from tab_drawdown import DrawdownChartTab
 from tab_optimization import OptimizationTab
@@ -567,7 +568,6 @@ class DetailWindow:
         starting_date_as_value = self.__convert_date_to_internalDate__(_options.startDate.m, _options.startDate.d, _options.startDate.y, 0, 0)
         #GetEndingDateAsValue
         ending_date_as_value = self.__convert_date_to_internalDate__(_options.endDate.m, _options.endDate.d, _options.endDate.y, 23, 59)
-        time_window = _options.time_window
         #Filtering by Start and end date
         index_of_date_column = self.__get_index_of_date_column__()
 
@@ -575,8 +575,7 @@ class DetailWindow:
             current_internal_date = self.__convert_date_to_internalDate__(trade[index_of_date_column][0:2], trade[index_of_date_column][3:5], trade[index_of_date_column][6:11], trade[index_of_date_column][11:13], trade[index_of_date_column][14:])
             if (current_internal_date >= starting_date_as_value) and (current_internal_date <= ending_date_as_value) :
                 trades_to_return.append(trade)
-        #Filtering by time window
-        
+        #Filtering by time window  
         if _options.time_window == 'D':
             filtered_list_of_trades = []
             for trade in trades_to_return:
@@ -623,7 +622,50 @@ class DetailWindow:
                 index += 1
 
         elif _options.time_window == 'w':
-            pass
+            print("Weekly filtering options algo")
+            list_to_sum = []
+            week = []
+            DIFF_WEEK = (self.__convert_date_to_internalDate__(1, 2, 2001, 0, 0) - self.__convert_date_to_internalDate__(1, 1, 2001, 0, 0)) * 7
+            day_tmp = Date(trades_to_return[0][index_of_date_column][3:5], trades_to_return[0][index_of_date_column][0:2], trades_to_return[0][index_of_date_column][6:11])
+            #Reset to closer Monday
+            last_date_of_trade_as_value = reset_to_monday(day_tmp, self.__convert_date_to_internalDate__(trades_to_return[0][index_of_date_column][0:2], trades_to_return[0][index_of_date_column][3:5], trades_to_return[0][index_of_date_column][6:11], 0, 0))
+            
+            print("DIFF_WEEK: ", DIFF_WEEK)
+            for trade in trades_to_return:
+                current_date = trade[index_of_date_column]
+                current_date_as_value = self.__convert_date_to_internalDate__(current_date[0:2], current_date[3:5], current_date[6:11], current_date[11:13], current_date[14:])
+                if (current_date_as_value - last_date_of_trade_as_value) <= DIFF_WEEK:
+                    print("Differenza tra due trade date<intraweek>: ", str(current_date_as_value - last_date_of_trade_as_value))
+                    week.append(trade)
+                    last_date_of_trade_as_value = self.__convert_date_to_internalDate__(current_date[0:2], current_date[3:5], current_date[6:11], 0, 0)
+                else:
+                    print("Differenza tra due trade date<out of a week>: ", str(current_date_as_value - last_date_of_trade_as_value))
+                    list_to_sum.append(week)
+                    week = []
+                    week.append(trade)
+                    day_tmp = Date(current_date[3:5], current_date[0:2], current_date[6:11])
+                    #Reset to closer Monday
+                    last_date_of_trade_as_value = reset_to_monday(day_tmp, self.__convert_date_to_internalDate__(current_date[0:2], current_date[3:5], current_date[6:11], 0, 0))
+
+            #Merging data from the same time interval
+            filtered_list_of_trades = []
+            index = 0
+            name = trades_to_return[0][1]
+            symbol = trades_to_return[0][2]
+            volume = trades_to_return[0][3]
+            closing_date =  None
+            net_cumulative = 0
+            for week_c in list_to_sum:
+                for d in week_c:
+                    net_cumulative = net_cumulative + d[-2]
+                    closing_date = d[-3][:-6] + " 00:00"
+                    name = d[1]
+                    symbol = d[2]
+                    volume = d[3]
+                filtered_list_of_trades.append([index, name, symbol, volume, closing_date, float(net_cumulative), 0])
+                net_cumulative = 0
+                index += 1
+
         elif _options.time_window == 'm':
             print("Monthly filtering options algo")
             list_to_sum = []
