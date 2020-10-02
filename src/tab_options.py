@@ -42,7 +42,7 @@ class OptionTab(QtWidgets.QTabWidget):
         #Set Default values and current values of Option obj
         self.options_image.setValues(Date(int(startDate[3:5]), int(startDate[0:2]), int(startDate[-4:])), 
                                     Date(int(endDate[3:5]), int(endDate[0:2]), int(endDate[-4:])),
-                                    'D')
+                                    'D', [True, True, True, False])
     #Load the Graphical Content
     def __load_ui__(self):
         spacing_left = 10
@@ -238,8 +238,14 @@ class OptionTab(QtWidgets.QTabWidget):
 
         new_date_start = Date(month_s, day_s, year_s)
         new_date_end = Date(month_e, day_e, year_e)
+        #Get GUI values
+        guistate = []
+        guistate.append(self.checkbox_startdate.isChecked())
+        guistate.append(self.checkbox_enddate.isChecked())
+        guistate.append(self.radiobutton_custom_date.isChecked())
+        guistate.append(self.radiobutton_real_money_gain.isChecked())
         #load new values 
-        self.options_image.setValues(new_date_start, new_date_end, time_window) 
+        self.options_image.setValues(new_date_start, new_date_end, time_window, guistate) 
         #Change list of trades
         self.cw.reload_tabs(self.options_image)       
     #Reset the current Gui state to Option Obj
@@ -260,7 +266,7 @@ class OptionTab(QtWidgets.QTabWidget):
       self.cal_frame.hide()
     #Load a particular state of GUI by specifying the options
     def load_state(self, _options):
-        print("Loading previous state of options")
+        print("Loading previous state of options:")
         self.textbox_startdate.setText(str(_options.startDate.m) + "/" + str(_options.startDate.d) + "/" + str(_options.startDate.y) + " 00:00" )
         self.textbox_enddate.setText(str(_options.endDate.m) + "/" + str(_options.endDate.d) + "/" + str(_options.endDate.y) + " 23:59")
         if _options.time_window == 'D':
@@ -271,5 +277,12 @@ class OptionTab(QtWidgets.QTabWidget):
             self.combobox_time_window.setCurrentIndex(self.combobox_time_window.findText('Monthly'))
         elif _options.time_window == 'w':
             self.combobox_time_window.setCurrentIndex(self.combobox_time_window.findText('Weekly'))
+         #Setting checkbox and radiobuttons
+        self.checkbox_startdate.setChecked(_options.state_checkbox_startDate)
+        self.checkbox_enddate.setChecked(_options.state_checkbox_endDate)
+        self.radiobutton_custom_date.setChecked(_options.state_radiobutton_custom)
+        self.radiobutton_real_money_gain.setChecked(_options.state_radiobutton_realmoneygain)
+        
+
 
 
