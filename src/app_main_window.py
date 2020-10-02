@@ -119,6 +119,7 @@ class MainWindow:
         self.remove_system_btn.setGeometry(QtCore.QRect(self.spacing_left, y, 150, 31))
         self.font.setPointSize(22)
         self.remove_system_btn.setText("Remove selected system")
+        self.remove_system_btn.setEnabled(False)
         #Combobox_REMOVE_SELECTED_ITEM
         self.remove_selected_item_cbox = QtWidgets.QComboBox(self.frame)
         self.remove_selected_item_cbox.setGeometry(QtCore.QRect(self.spacing_left + 150, y, 150, 31))
@@ -143,6 +144,7 @@ class MainWindow:
         self.loadDetails_btn.setGeometry(QtCore.QRect(self.spacing_left +300, 400, 150, 31))
         self.font.setPointSize(22)
         self.loadDetails_btn.setText("Load details")
+        self.loadDetails_btn.setEnabled(False)
         #Warning wrong quantity label
         self.wrong_qnt_label = QtWidgets.QLabel(self.frame)
         self.wrong_qnt_label.setGeometry(QtCore.QRect(self.spacing_left +460, 400, 175, 31))
@@ -314,8 +316,11 @@ class MainWindow:
                 self.loadDetails_selected_item_cbox.addItem("0 : Portfolio")
                 self.loadDetails_selected_item_cbox.addItem(complete_item_name)
             else:
-                self.loadDetails_selected_item_cbox.addItem(complete_item_name)
-        print(self.current_portfolio.scalings)      
+                self.loadDetails_selected_item_cbox.addItem(complete_item_name)    
+
+            #Activate loading button
+            self.loadDetails_btn.setEnabled(True)  
+            self.remove_system_btn.setEnabled(True)
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
         self.isQuantityChangedByMethod = True
@@ -343,6 +348,9 @@ class MainWindow:
         if len(self.current_portfolio.trading_systems)== 0:
             if self.summary != None:
                 self.summary.hide()
+            self.remove_selected_item_cbox.clear()
+            #DeActivate loading button
+            self.clear_portfolio_btn_Onclick()
     #CLEAR_PORTFOLIO_BUTTON_HANDLER
     def clear_portfolio_btn_Onclick(self):
         self.isQuantityChangedByMethod = True
@@ -355,6 +363,10 @@ class MainWindow:
         #reset scalings
         self.current_portfolio.scalings = []
         self.isQuantityChangedByMethod = False
+
+        #Activate loading button
+        self.loadDetails_btn.setEnabled(False)
+        self.remove_system_btn.setEnabled(False)
     #close mainwindow
     def close_window_Onclik(self):
         self.frame.close()
