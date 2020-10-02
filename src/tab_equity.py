@@ -1,3 +1,4 @@
+#Oggetto rappresentazione di una tab < equity >
 from PyQt5 import QtCore, QtGui, QtWidgets
 import numpy as np
 import pandas as pd

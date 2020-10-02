@@ -1,3 +1,4 @@
+#Oggetto rappresentazione di una tab < Options >
 from PyQt5 import QtCore, QtGui, QtWidgets
 from copy import deepcopy
 from options import Option

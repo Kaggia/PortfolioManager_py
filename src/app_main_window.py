@@ -1,5 +1,5 @@
-#graphics.py
-#Libreria grafica contenente gli oggetti dell'interfaccia
+#app_main_window.py
+#Libreria contenente la finestra principale, loading dei trading systems
 #Libraries
 from PyQt5 import QtCore, QtGui, QtWidgets
 from operator import itemgetter

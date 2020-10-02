@@ -1,7 +1,7 @@
-from datetime import date
-
 #date.py
 #Classe per la descrizione custom delle date
+from datetime import date
+
 def get_day_of_week(_date):
     d = date(_date.y, _date.m, _date.d)
     print("Day of week is: ", d.weekday())

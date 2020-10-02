@@ -1,5 +1,5 @@
-#graphics.py
-#Libreria grafica contenente gli oggetti dell'interfaccia
+#app_detail_window.py
+#Libreria contenente la finestra secondaria, printing dei dati
 #Libraries
 from PyQt5 import QtCore, QtGui, QtWidgets
 from operator import itemgetter

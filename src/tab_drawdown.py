@@ -1,3 +1,4 @@
+#Oggetto rappresentazione di una tab < drawdown >
 from PyQt5 import QtCore, QtGui, QtWidgets
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure

@@ -1,3 +1,4 @@
+#Oggetto rappresentazione di un canvas per il printing di un grafico su tab < drawdown >
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
