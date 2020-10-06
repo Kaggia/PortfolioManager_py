@@ -63,9 +63,6 @@ class DetailWindow:
         self.__tab_options_loader()
         self.__tab_optimization_loader()
 
-        #LOAD <MOMENTANEOUS> SUBWINDOW
-        trade_list_window = subwindow_trades_list.TradeListWindow(self.trades)
-
         self.frame.show()      
     #load report tab 
     def __tab_report_loader__(self):

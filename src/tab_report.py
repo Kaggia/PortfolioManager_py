@@ -1,5 +1,6 @@
 #Oggetto rappresentazione di una tab < report >
 from PyQt5 import QtCore, QtGui, QtWidgets
+from subwindows_report_tab import subwindow_trades_list
 
 #Instanciate and manage the report tab, printing all indexes
 class ReportTab(QtWidgets.QTabWidget):
@@ -46,6 +47,7 @@ class ReportTab(QtWidgets.QTabWidget):
                                             )
         text_label.setText(_text_to_show)
         self.__grid_counting__()
+
     #when you add a row, manage the colums
     def __grid_counting__(self):
         self.grid_counting["X"] += 1
