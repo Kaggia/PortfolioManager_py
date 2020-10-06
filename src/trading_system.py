@@ -159,3 +159,14 @@ class TradingSystem:
         for row in self.trade_list:
             print(row)
             print("")
+    
+class TradingSystemSchema :
+    def __init__(self):
+        #Attributes
+        self.id = None
+        self.name = None
+        self.symbol = None
+        self.trade_list = None
+        self.indexes = None 
+        self.market = None
+        self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Volume', 'Close Time', 'Net']
