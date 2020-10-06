@@ -23,6 +23,7 @@ from tab_drawdown import DrawdownChartTab
 from tab_optimization import OptimizationTab
 from tab_options import OptionTab
 from tab_report import ReportTab
+from subwindows_report_tab import subwindow_trades_list
 
 #Window where various details are shown
 class DetailWindow:
@@ -61,6 +62,9 @@ class DetailWindow:
         self.__tab_drawdownChart_loader()
         self.__tab_options_loader()
         self.__tab_optimization_loader()
+
+        #LOAD <MOMENTANEOUS> SUBWINDOW
+        trade_list_window = subwindow_trades_list.TradeListWindow(self.trades)
 
         self.frame.show()      
     #load report tab 
