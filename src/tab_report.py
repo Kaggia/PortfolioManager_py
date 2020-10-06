@@ -1,3 +1,4 @@
+#Oggetto rappresentazione di una tab < report >
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 #Instanciate and manage the report tab, printing all indexes
