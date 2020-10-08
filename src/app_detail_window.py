@@ -43,7 +43,7 @@ class DetailWindow:
         
         # Initialize tab screen
         self.tabs = QtWidgets.QTabWidget(self.frame)
-        self.tab_report = ReportTab(self.trades, 2, 17, 100, 20) #(index_per_column, spacingX, spacingY)
+        self.tab_report = ReportTab(self.trades, 2, 17, 100, 22) #(index_per_column, spacingX, spacingY)
         self.tab_drawdown = DrawdownChartTab(self.trades)
         self.tab_equity = EquityChartTab(self.trades)
         self.tab_options = OptionTab(self.trades, self)

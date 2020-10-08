@@ -39,6 +39,30 @@ class ReportTab(QtWidgets.QTabWidget):
                                             )
         index_value_label.setText(str(_index_value))
         self.__grid_counting__()
+    #add a new Subwindow<text, button> specifying <index_name> and his <value>
+    def add_new_subwindow(self, _label_text, _btn_text, _handler):
+        #positioning in a new line
+        self.positioning_cursor["Y"] += self.spacing["Y"]
+        #index_text
+        index_text_label = QtWidgets.QLabel(self)
+        index_text_label.setGeometry(QtCore.QRect(self.positioning_cursor["X"] + (self.column_distancing * self.grid_counting["Y"]), 
+                                                        self.positioning_cursor["Y"], 
+                                                         150, 
+                                                          30)
+                                            )
+        index_text_label.setText(_label_text)
+        #button text value
+        btn = QtWidgets.QPushButton(self)
+        btn.setGeometry(QtCore.QRect(self.positioning_cursor["X"] + self.spacing["X"] + (self.column_distancing * self.grid_counting["Y"]), 
+                                                        self.positioning_cursor["Y"], 
+                                                         75, 
+                                                          25)
+                                            )
+        btn.setText(str(_btn_text))
+
+        #Attach Handler
+        btn.clicked.connect(_handler)
+        self.__grid_counting__()
     #add a simple text
     def add_text(self, _text_to_show):
         #positioning in a new line
@@ -110,3 +134,9 @@ class ReportTab(QtWidgets.QTabWidget):
         self.add_new_index("Max Lose streak: ", max_los_streak.calculate())
         self.add_new_index("Size required: ", size_require.calculate())
         self.add_new_index("Avg monthly return: ", monthly_return.calculate())
+
+        #Buttons
+        self.add_new_subwindow("Trades list: ", "Open", self.open_subwindow_trades_onClick)
+    #handlers of subwindows-buttons
+    def open_subwindow_trades_onClick(self):
+        new_subw_trades = subwindow_trades_list.TradeListWindow(self.trades)
