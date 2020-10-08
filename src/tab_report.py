@@ -1,6 +1,7 @@
 #Oggetto rappresentazione di una tab < report >
 from PyQt5 import QtCore, QtGui, QtWidgets
 from subwindows_report_tab import subwindow_trades_list
+from subwindows_report_tab import subwindow_temporal_analysis
 from copy import deepcopy
 from indexes import *
 
@@ -17,7 +18,11 @@ class ReportTab(QtWidgets.QTabWidget):
         self.positioning_cursor = {"X": 10, "Y": -20} #Posizione del cursore per il posizionamento
         self.spacing = {"X": _spacingX, "Y": _spacingY} #Spazio tra gli elementi
 
+        self.__secondary_windows__ = []
+
         self.__load__()
+
+
     #add a new index specifying <index_name> and his <value>
     def add_new_index(self, _index_name, _index_value):
         #positioning in a new line
@@ -137,6 +142,12 @@ class ReportTab(QtWidgets.QTabWidget):
 
         #Buttons
         self.add_new_subwindow("Trades list: ", "Open", self.open_subwindow_trades_onClick)
+        self.add_new_subwindow("Temporal Analysis: ", "Open", self.open_subwindow_tempAnalysis_onClick)
     #handlers of subwindows-buttons
     def open_subwindow_trades_onClick(self):
         new_subw_trades = subwindow_trades_list.TradeListWindow(self.trades)
+        print("SubWindow<TradesList> opened.")
+    def open_subwindow_tempAnalysis_onClick(self):
+        new_subw_tempanalysis = subwindow_temporal_analysis.TemporalAnalysisWindow(self.trades)
+        self.__secondary_windows__.append(new_subw_tempanalysis) 
+        print("SubWindow<TempAnalysis> opened.")
