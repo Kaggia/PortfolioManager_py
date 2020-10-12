@@ -170,3 +170,4 @@ class TradingSystemSchema :
         self.indexes = None 
         self.market = None
         self.__colums_checkList__ = ['Closing Deal ID', 'Label', 'Symbol', 'Volume', 'Close Time', 'Net']
+        self.date_index_column = 4

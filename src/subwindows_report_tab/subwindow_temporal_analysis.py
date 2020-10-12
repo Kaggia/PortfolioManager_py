@@ -13,6 +13,9 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from tab_obj_canvas import MplCanvas
 from PyQt5 import QtCore, QtGui, QtWidgets
+#MyLibs
+from trading_system import TradingSystemSchema
+from date import CompleteDate
 
 class TemporalAnalysisWindow:
     def __init__(self, _trade_list):
@@ -40,26 +43,32 @@ class TemporalAnalysisWindow:
 
         #Button_Previous
         self.prev_btn = QtWidgets.QPushButton(self.frame)
-        self.prev_btn.setGeometry(QtCore.QRect((self.frame.size().width() / 2) - 100, int(self.frame.size().height() *0.70), 100, 40))
+        self.prev_btn.setGeometry(QtCore.QRect((self.frame.size().width() / 2) - 100, int(self.frame.size().height() *0.57), 100, 40))
         self.prev_btn.setText("<= Previous page")
         self.prev_btn.setEnabled(True)
         #Button_Previous
         self.next_btn = QtWidgets.QPushButton(self.frame)
-        self.next_btn.setGeometry(QtCore.QRect((self.frame.size().width() / 2), int(self.frame.size().height() *0.70), 100, 40))
+        self.next_btn.setGeometry(QtCore.QRect((self.frame.size().width() / 2), int(self.frame.size().height() *0.57), 100, 40))
         self.next_btn.setText("Next page =>")
         self.next_btn.setEnabled(True)
 
+        #Groupbox_loaders
         self.__load_groupbox_temp_selection__()
         self.__load_groupbox_year_selection__()
         self.__load_groupbox_month_selection__()
 
+        #handlers
+        self.yearly_choice_rb.clicked.connect(self.yearly_choice_rb_onClick)
+        self.monthly_choice_rb.clicked.connect(self.monthly_choice_rb_onClick)
 
+        #Set the initial groupbox state
+        self.yearly_choice_rb_onClick()
     def __load_groupbox_temp_selection__(self):
-        groupbox_temp_choice = QtWidgets.QGroupBox("Choose temporal window", self.frame )
-        groupbox_temp_choice.setGeometry(QtCore.QRect(50, 450, 175, 100))
+        self.groupbox_temp_choice = QtWidgets.QGroupBox("Choose temporal window", self.frame )
+        self.groupbox_temp_choice.setGeometry(QtCore.QRect(50, 450, 175, 100))
         
         vbox = QtWidgets.QVBoxLayout()
-        groupbox_temp_choice.setLayout(vbox)
+        self.groupbox_temp_choice.setLayout(vbox)
 
         #RadioButton
         self.monthly_choice_rb = QtWidgets.QRadioButton()
@@ -79,11 +88,11 @@ class TemporalAnalysisWindow:
         vbox.addWidget(self.yearly_choice_rb)
 
     def __load_groupbox_year_selection__(self):
-        groupbox_year_choice = QtWidgets.QGroupBox("Choose year to show", self.frame )
-        groupbox_year_choice.setGeometry(QtCore.QRect(250, 450, 175, 100))
+        self.groupbox_year_choice = QtWidgets.QGroupBox("Choose year to show", self.frame )
+        self.groupbox_year_choice.setGeometry(QtCore.QRect(250, 450, 175, 100))
         
         vbox = QtWidgets.QVBoxLayout()
-        groupbox_year_choice.setLayout(vbox)
+        self.groupbox_year_choice.setLayout(vbox)
 
         #Combobox
         self.combobox_year_select = QtWidgets.QComboBox()
@@ -97,11 +106,11 @@ class TemporalAnalysisWindow:
         vbox.addWidget(self.combobox_year_select)
 
     def __load_groupbox_month_selection__(self):
-        groupbox_month_choice = QtWidgets.QGroupBox("Choose month to show", self.frame )
-        groupbox_month_choice.setGeometry(QtCore.QRect(450, 450, 175, 100))
+        self.groupbox_month_choice = QtWidgets.QGroupBox("Choose month to show", self.frame )
+        self.groupbox_month_choice.setGeometry(QtCore.QRect(450, 450, 175, 100))
         
         vbox = QtWidgets.QVBoxLayout()
-        groupbox_month_choice.setLayout(vbox)
+        self.groupbox_month_choice.setLayout(vbox)
 
         #Combobox
         self.combobox_month_select = QtWidgets.QComboBox()
@@ -121,10 +130,42 @@ class TemporalAnalysisWindow:
 
         self.combobox_month_select.setCurrentIndex(0)
 
-        vbox.addWidget(self.combobox_month_select)
+        vbox.addWidget(self.combobox_month_select)    
+    #Radiobutton Handlers
+    def monthly_choice_rb_onClick(self):
+        self.groupbox_month_choice.setVisible(False)
+        self.groupbox_year_choice.setVisible(True)
+    def yearly_choice_rb_onClick(self):
+        self.groupbox_year_choice.setVisible(False)
+        self.groupbox_month_choice.setVisible(False)    
     #Detect temporal view: YEARS - MONTHS - DAYS
     def __detect_initial_temporal_view__(self):
-        temporal_view = 'd'
+        temporal_view = '_'
+        tss = TradingSystemSchema()
+        date_index = tss.date_index_column
+        first_date = CompleteDate(self.trade_list[0][date_index][0:2],
+                                    self.trade_list[0][date_index][3:5],
+                                      self.trade_list[0][date_index][6:11],
+                                        self.trade_list[0][date_index][11:13],
+                                          self.trade_list[0][date_index][14:])
+        last_date = CompleteDate(self.trade_list[-1][date_index][0:2],
+                                    self.trade_list[-1][date_index][3:5],
+                                      self.trade_list[-1][date_index][6:11],
+                                        self.trade_list[-1][date_index][11:13],
+                                          self.trade_list[-1][date_index][14:])
+        print("First date of trade-> ", first_date.internal_date)
+        print("Last date of trade-> ", last_date.internal_date)
+
+        YEAR_ANALSYSIS_SOIL = 525600
+
+        date_diff = last_date.internal_date - first_date.internal_date
+
+        if date_diff > YEAR_ANALSYSIS_SOIL:
+            temporal_view = 'y'
+            print("[INFO] Temporal window automatically chosen is: Yearly")
+        else:
+            temporal_view = 'm'
+            print("[INFO] Temporal window automatically chosen is: Monthly")
 
         return temporal_view
     #Filter trade list to adapt to trade view

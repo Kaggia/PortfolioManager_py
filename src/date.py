@@ -19,3 +19,20 @@ class Date:
         self.d = int(day)
         self.m = int(month)
         self.y = int(year)
+class CompleteDate:
+    def __init__(self, day, month, year, hours, minutes):
+        self.d = int(day)
+        self.m = int(month)
+        self.y = int(year)
+        self.h = int(hours)
+        self.mins = int(minutes)
+        self.internal_date = self.__convert_date_to_internalDate__(self.m, self.d, self.y, self.h, self.mins)
+    def __convert_date_to_internalDate__(self, _month, _day, _year, _hour, _minute):
+        day_value = (int(_day) - 1 ) * 1440
+        month_value = (int(_month) - 1 ) * 43800
+        year_value = (int(_year) - 2000 ) * 524160
+        hour_value = int(_hour) * 60
+        minute_value = int(_minute)
+        sum_of_minutes = day_value + month_value + year_value + hour_value + minute_value
+
+        return sum_of_minutes

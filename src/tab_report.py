@@ -146,8 +146,6 @@ class ReportTab(QtWidgets.QTabWidget):
     #handlers of subwindows-buttons
     def open_subwindow_trades_onClick(self):
         new_subw_trades = subwindow_trades_list.TradeListWindow(self.trades)
-        print("SubWindow<TradesList> opened.")
     def open_subwindow_tempAnalysis_onClick(self):
         new_subw_tempanalysis = subwindow_temporal_analysis.TemporalAnalysisWindow(self.trades)
         self.__secondary_windows__.append(new_subw_tempanalysis) 
-        print("SubWindow<TempAnalysis> opened.")
