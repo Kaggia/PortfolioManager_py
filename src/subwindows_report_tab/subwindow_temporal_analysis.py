@@ -16,14 +16,24 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #MyLibs
 from trading_system import TradingSystemSchema
 from date import CompleteDate
+from indexes import Equity
 
 class TemporalAnalysisWindow:
     def __init__(self, _trade_list):
         self.trade_list = deepcopy(_trade_list)
         self.trade_list_default = deepcopy(_trade_list)
-        self.current_temporal_view = self.__detect_initial_temporal_view__()
+        self.book = [] #Chart data
+        self.current_page_shown = 0
 
+        
         self.__gui_load__()
+        self.__detect_initial_temporal_view__()
+        self.load_data_as_book(bar_per_page = 3)
+        #Set next button state
+        if len(self.book) == 1:
+            self.next_btn.setEnabled(False)
+        else:
+            self.next_btn.setEnabled(True)
 
 
         self.frame.show()
@@ -32,7 +42,6 @@ class TemporalAnalysisWindow:
         sc.axes.hist([0, 1, 2]) #xList, ylist
         sc.setParent(self.frame)
         sc.show()
-        print("Temporal analysis window is fully loaded.")
     #Load GUI elements
     def __gui_load__(self):
         self.frame = QtWidgets.QMainWindow()
@@ -45,13 +54,13 @@ class TemporalAnalysisWindow:
         self.prev_btn = QtWidgets.QPushButton(self.frame)
         self.prev_btn.setGeometry(QtCore.QRect((self.frame.size().width() / 2) - 100, int(self.frame.size().height() *0.57), 100, 40))
         self.prev_btn.setText("<= Previous page")
-        self.prev_btn.setEnabled(True)
+        self.prev_btn.setEnabled(False)
         #Button_Previous
         self.next_btn = QtWidgets.QPushButton(self.frame)
         self.next_btn.setGeometry(QtCore.QRect((self.frame.size().width() / 2), int(self.frame.size().height() *0.57), 100, 40))
         self.next_btn.setText("Next page =>")
-        self.next_btn.setEnabled(True)
-
+        
+        
         #Groupbox_loaders
         self.__load_groupbox_temp_selection__()
         self.__load_groupbox_year_selection__()
@@ -60,6 +69,8 @@ class TemporalAnalysisWindow:
         #handlers
         self.yearly_choice_rb.clicked.connect(self.yearly_choice_rb_onClick)
         self.monthly_choice_rb.clicked.connect(self.monthly_choice_rb_onClick)
+        self.prev_btn.clicked.connect(self.prev_btn_onClick)
+        self.next_btn.clicked.connect(self.next_btn_onClick)
 
         #Set the initial groupbox state
         self.yearly_choice_rb_onClick()
@@ -131,6 +142,37 @@ class TemporalAnalysisWindow:
         self.combobox_month_select.setCurrentIndex(0)
 
         vbox.addWidget(self.combobox_month_select)    
+    #Buttons handlers
+    def prev_btn_onClick(self):
+        print("Turning page previous")
+        self.current_page_shown -= 1
+        print("Current page is: ", self.current_page_shown)
+        if self.current_page_shown == 0:
+            self.prev_btn.setEnabled(False)
+            self.next_btn.setEnabled(True)
+        if self.current_page_shown == len(self.book)-1:
+            self.next_btn.setEnabled(False)
+            self.prev_btn.setEnabled(True)
+        if (self.current_page_shown != 0) and (self.current_page_shown != len(self.book)-1):
+            self.prev_btn.setEnabled(True)
+            self.next_btn.setEnabled(True)
+        
+    def next_btn_onClick(self):
+        print("Turning page next")
+        self.current_page_shown += 1
+        print("Current page is: ", self.current_page_shown)
+        if self.current_page_shown == 0:
+            self.prev_btn.setEnabled(False)
+            self.next_btn.setEnabled(True)
+        if self.current_page_shown == len(self.book)-1:
+            self.next_btn.setEnabled(False)
+            self.prev_btn.setEnabled(True)
+        if (self.current_page_shown != 0) and (self.current_page_shown != len(self.book)-1):
+            self.prev_btn.setEnabled(True)
+            self.next_btn.setEnabled(True)
+        
+
+        
     #Radiobutton Handlers
     def monthly_choice_rb_onClick(self):
         self.groupbox_month_choice.setVisible(False)
@@ -140,7 +182,6 @@ class TemporalAnalysisWindow:
         self.groupbox_month_choice.setVisible(False)    
     #Detect temporal view: YEARS - MONTHS - DAYS
     def __detect_initial_temporal_view__(self):
-        temporal_view = '_'
         tss = TradingSystemSchema()
         date_index = tss.date_index_column
         first_date = CompleteDate(self.trade_list[0][date_index][0:2],
@@ -161,20 +202,97 @@ class TemporalAnalysisWindow:
         date_diff = last_date.internal_date - first_date.internal_date
 
         if date_diff > YEAR_ANALSYSIS_SOIL:
-            temporal_view = 'y'
+            self.yearly_choice_rb_onClick()
             print("[INFO] Temporal window automatically chosen is: Yearly")
         else:
-            temporal_view = 'm'
+            self.monthly_choice_rb_onClick()
             print("[INFO] Temporal window automatically chosen is: Monthly")
-
-        return temporal_view
     #Filter trade list to adapt to trade view
     def __filter_data_by_temporal_view(self, _tv):
         pass
-    #Load data on chart
-    def load_data_on_chart(self):
-        if self.current_temporal_view == 'm':
-            pass
-        elif self.current_temporal_view == 'y':
-            pass
+    #Load data on chart as book, collection of pages->collection of TradesByYear->Collection of trades
+    def load_data_as_book(self, bar_per_page):
+        trades = deepcopy(self.trade_list)
+        tss = TradingSystemSchema()
+        self.book = []
+        
+        if self.monthly_choice_rb.isChecked():
+            print("Start Monthly filtering")
+        elif self.yearly_choice_rb.isChecked():
+            print("Start Yearly filtering")
+            first_date_resetted = CompleteDate(1,
+                            1,
+                              trades[0][tss.date_index_column][6:11],
+                                0,
+                                    0)
+            last_date_resetted = CompleteDate(1,
+                            1,
+                                trades[-1][tss.date_index_column][6:11],
+                                0,
+                                    0)
+            year_counter = last_date_resetted.internal_date
+            YEAR_IN_MINS = 525600
+            list_of_trade_by_years = []
+            #Create a list of years <empty>
+            for y in range(first_date_resetted.y, last_date_resetted.y + 1):
+                list_of_trade_by_years.append(TradesByYear(y))
+            #Fill a list of years <empty>
+            for trade in trades:
+                current_date = CompleteDate(trade[tss.date_index_column][0:2],
+                                                trade[tss.date_index_column][3:5],
+                                                    trade[tss.date_index_column][6:11],
+                                                        0,
+                                                            0)
+                current_year = current_date.y
+                #inserire il trade nella lista dell'anno <current_year>
+                list_of_trade_by_years[int(current_year-first_date_resetted.y)].add_trade(trade)
+            #Print data on chart as a book
+            #Collection of trades
+            page = []
+            index = 1
+            for el in list_of_trade_by_years:
+               if index <= bar_per_page:
+                    page.append(el)
+                    index += 1
+                    print("Element added to page")
+                    for i in page:
+                        i.print_year()
+               else:
+                    self.book.append(page)
+                    print("page added to book")
+                    page = []
+                    index = 1
+            if page:
+                self.book.append(page)
+            print("page added to book")
+            print("Book len is->", len(self.book))
 
+            #CONTROLLARE ALGORITMO <MANCANO 2010 e 2014> File di prova BOT_2
+
+
+
+class TradesByYear:
+    def __init__(self,_year):
+        self.year = _year
+        self.trade_list = []
+    #Add single trade to the year of trade
+    def add_trade(self, _trade):
+        trade = deepcopy(_trade)
+        self.trade_list.append(trade)
+    #Return the equity of this year
+    def getEquity(self):
+        equity = Equity(self.trade_list)
+        if not self.trade_list:
+            return 0
+        else:
+            return equity.calculate()
+    #Print some data
+    def print_data(self):
+        print("Year: ", self.year)
+        for trade in self.trade_list:
+            print(trade)
+        print("Equity of this year-> ", str(self.getEquity()))
+        print("------------------")
+
+    def print_year(self):
+        print(str(self.year))
