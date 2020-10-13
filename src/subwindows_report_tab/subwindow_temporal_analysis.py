@@ -28,7 +28,7 @@ class TemporalAnalysisWindow:
         
         self.__gui_load__()
         self.__detect_initial_temporal_view__()
-        self.load_data_as_book(bar_per_page = 3)
+        self.load_data_as_book(bar_per_page = 4)
         #Set next button state
         if len(self.book) == 1:
             self.next_btn.setEnabled(False)
@@ -38,10 +38,9 @@ class TemporalAnalysisWindow:
 
         self.frame.show()
         #Setting the chart inside the canvas obj
-        sc = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
-        sc.axes.hist([0, 1, 2]) #xList, ylist
-        sc.setParent(self.frame)
-        sc.show()
+        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
+        self.load_data_on_chart(self.book, 0)
+
     #Load GUI elements
     def __gui_load__(self):
         self.frame = QtWidgets.QMainWindow()
@@ -142,37 +141,37 @@ class TemporalAnalysisWindow:
         self.combobox_month_select.setCurrentIndex(0)
 
         vbox.addWidget(self.combobox_month_select)    
-    #Buttons handlers
+    #Previous button handler method
     def prev_btn_onClick(self):
-        print("Turning page previous")
-        self.current_page_shown -= 1
-        print("Current page is: ", self.current_page_shown)
+        print("Button Previous pressed.")
+        self.current_page_shown -=1
+        #SHOW ON CHART
+        #Check page
         if self.current_page_shown == 0:
             self.prev_btn.setEnabled(False)
-            self.next_btn.setEnabled(True)
+        else:
+            self.prev_btn.setEnabled(True)
         if self.current_page_shown == len(self.book)-1:
             self.next_btn.setEnabled(False)
-            self.prev_btn.setEnabled(True)
-        if (self.current_page_shown != 0) and (self.current_page_shown != len(self.book)-1):
-            self.prev_btn.setEnabled(True)
+        else:
             self.next_btn.setEnabled(True)
-        
+        self.load_data_on_chart(self.book, self.current_page_shown)
+    #Next button handler method    
     def next_btn_onClick(self):
-        print("Turning page next")
-        self.current_page_shown += 1
-        print("Current page is: ", self.current_page_shown)
+        print("Button Next pressed.")
+        self.current_page_shown +=1
+        #SHOW ON CHART
+        #Check start of book
         if self.current_page_shown == 0:
             self.prev_btn.setEnabled(False)
-            self.next_btn.setEnabled(True)
+        else:
+            self.prev_btn.setEnabled(True)
+        #Check end of book
         if self.current_page_shown == len(self.book)-1:
             self.next_btn.setEnabled(False)
-            self.prev_btn.setEnabled(True)
-        if (self.current_page_shown != 0) and (self.current_page_shown != len(self.book)-1):
-            self.prev_btn.setEnabled(True)
-            self.next_btn.setEnabled(True)
-        
-
-        
+        else:
+            self.next_btn.setEnabled(True)  
+        self.load_data_on_chart(self.book, self.current_page_shown)
     #Radiobutton Handlers
     def monthly_choice_rb_onClick(self):
         self.groupbox_month_choice.setVisible(False)
@@ -247,30 +246,38 @@ class TemporalAnalysisWindow:
                 #inserire il trade nella lista dell'anno <current_year>
                 list_of_trade_by_years[int(current_year-first_date_resetted.y)].add_trade(trade)
             #Print data on chart as a book
-            #Collection of trades
+            
+            i = 0
             page = []
-            index = 1
-            for el in list_of_trade_by_years:
-               if index <= bar_per_page:
-                    page.append(el)
-                    index += 1
-                    print("Element added to page")
-                    for i in page:
-                        i.print_year()
-               else:
+            for year_of_trades in list_of_trade_by_years:
+                if i < 3 :
+                    page.append(year_of_trades)
+                    i +=1
+                else:
+                    i = 0
                     self.book.append(page)
-                    print("page added to book")
                     page = []
-                    index = 1
-            if page:
-                self.book.append(page)
-            print("page added to book")
-            print("Book len is->", len(self.book))
+                    page.append(year_of_trades)
+                    i +=1
 
-            #CONTROLLARE ALGORITMO <MANCANO 2010 e 2014> File di prova BOT_2
-
-
-
+    def load_data_on_chart(self, book, index_page_to_show):
+        #la pagina contiene i dati
+        page_to_show = book[index_page_to_show]
+        x_list = []
+        y_list = []
+        colors = []
+        for tby in page_to_show:
+            y_list.append(tby.getEquity())
+            x_list.append(tby.year)
+            if(tby.getEquity() > 0):
+                colors.append('g') 
+            else:
+                colors.append('r')
+        
+        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
+        self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
+        self.canvas_chart.setParent(self.frame)
+        self.canvas_chart.show()
 class TradesByYear:
     def __init__(self,_year):
         self.year = _year
@@ -293,6 +300,3 @@ class TradesByYear:
             print(trade)
         print("Equity of this year-> ", str(self.getEquity()))
         print("------------------")
-
-    def print_year(self):
-        print(str(self.year))
