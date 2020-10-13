@@ -179,7 +179,7 @@ class TemporalAnalysisWindow:
     def yearly_choice_rb_onClick(self):
         self.groupbox_year_choice.setVisible(False)
         self.groupbox_month_choice.setVisible(False)    
-    #Detect temporal view: YEARS - MONTHS - DAYS
+    #Detect temporal view: YEARS - MONTHS - DAYS analyzing the data
     def __detect_initial_temporal_view__(self):
         tss = TradingSystemSchema()
         date_index = tss.date_index_column
@@ -206,9 +206,6 @@ class TemporalAnalysisWindow:
         else:
             self.monthly_choice_rb_onClick()
             print("[INFO] Temporal window automatically chosen is: Monthly")
-    #Filter trade list to adapt to trade view
-    def __filter_data_by_temporal_view(self, _tv):
-        pass
     #Load data on chart as book, collection of pages->collection of TradesByYear->Collection of trades
     def load_data_as_book(self, bar_per_page):
         trades = deepcopy(self.trade_list)
@@ -250,16 +247,19 @@ class TemporalAnalysisWindow:
             i = 0
             page = []
             for year_of_trades in list_of_trade_by_years:
-                if i < 3 :
+                if i < bar_per_page :
                     page.append(year_of_trades)
                     i +=1
+                    #Controllo se è l'ultimo anno
+                    if year_of_trades.year == list_of_trade_by_years[-1].year:
+                        self.book.append(page)
                 else:
                     i = 0
                     self.book.append(page)
                     page = []
                     page.append(year_of_trades)
                     i +=1
-
+    #Print data collected in a book on canvas chart
     def load_data_on_chart(self, book, index_page_to_show):
         #la pagina contiene i dati
         page_to_show = book[index_page_to_show]
@@ -278,6 +278,53 @@ class TemporalAnalysisWindow:
         self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
         self.canvas_chart.setParent(self.frame)
         self.canvas_chart.show()
+    #Print some book data
+    def print_book_data(self):
+        p_ = 0
+        for page in self.book:
+            print("Page ", p_ , " contains:")
+            for year_in_page in page:
+                print("Year_data: ", year_in_page.year)
+            p_ += 1
+class TradesByMonth:
+    def __init__(self,_year):
+        self.year = _year
+        #This list has 12 elements < from jan-0 to dec 11>
+        self.months = []
+        for i in range(0, 12):
+            self.months.append(MonthOfTrades())
+    #Add a single trade to a specified month
+    def add_trade_to_month(self, m, value):
+        self.months[m].append(value)
+    #Print data about trade deep to single trade
+    def print_data_deep(self):
+        i = 0
+        for mot in self.months:
+            print("Month ", i, "of year ", mot.year, " has trade: ")
+            for trade in mot.trade_list:
+                print(trade)
+            print("--------------------")    
+            i +=1
+    #Print data about trade deep to single month
+    def print_data(self):
+        i = 0
+        for mot in self.months:
+            print("Month ", i, "of year ", mot.year, " has trade: ")
+            i +=1
+class MonthOfTrades:
+    def __init__(self):
+        self.trade_list = []
+    #Add single trade to the year of trade
+    def add_trade(self, trade):
+        trade = deepcopy(_trade)
+        self.trade_list.append(trade)
+    #Return the equity of this year
+    def getEquity(self):
+        equity = Equity(self.trade_list)
+        if not self.trade_list:
+            return 0
+        else:
+            return equity.calculate()
 class TradesByYear:
     def __init__(self,_year):
         self.year = _year
