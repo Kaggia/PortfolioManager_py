@@ -16,7 +16,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #MyLibs
 from trading_system import TradingSystemSchema
 from date import CompleteDate
-from indexes import Equity
+from indexes import Equity, MaximumDrawdown
 
 class TemporalAnalysisWindow:
     def __init__(self, _trade_list):
@@ -24,6 +24,7 @@ class TemporalAnalysisWindow:
         self.trade_list_default = deepcopy(_trade_list)
         self.book = [] #Chart data
         self.current_page_shown = 0
+        self.dict_performance_index = {'Net Profit' : 0, 'Drawdown': 1}
 
         
         self.__gui_load__()
@@ -39,8 +40,7 @@ class TemporalAnalysisWindow:
         self.frame.show()
         #Setting the chart inside the canvas obj
         self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
-        self.load_data_on_chart(self.book, 0)
-
+        self.load_data_on_chart(self.book, 0, 0)
     #Load GUI elements
     def __gui_load__(self):
         self.frame = QtWidgets.QMainWindow()
@@ -64,6 +64,7 @@ class TemporalAnalysisWindow:
         self.__load_groupbox_temp_selection__()
         self.__load_groupbox_year_selection__()
         self.__load_groupbox_month_selection__()
+        self.__load_groupbox_index_selection__()
 
         #handlers
         self.yearly_choice_rb.clicked.connect(self.yearly_choice_rb_onClick)
@@ -96,7 +97,6 @@ class TemporalAnalysisWindow:
 
         vbox.addWidget(self.monthly_choice_rb)
         vbox.addWidget(self.yearly_choice_rb)
-
     def __load_groupbox_year_selection__(self):
         self.groupbox_year_choice = QtWidgets.QGroupBox("Choose year to show", self.frame )
         self.groupbox_year_choice.setGeometry(QtCore.QRect(250, 450, 175, 100))
@@ -114,7 +114,6 @@ class TemporalAnalysisWindow:
         self.combobox_year_select.setCurrentIndex(0)
 
         vbox.addWidget(self.combobox_year_select)
-
     def __load_groupbox_month_selection__(self):
         self.groupbox_month_choice = QtWidgets.QGroupBox("Choose month to show", self.frame )
         self.groupbox_month_choice.setGeometry(QtCore.QRect(450, 450, 175, 100))
@@ -141,9 +140,26 @@ class TemporalAnalysisWindow:
         self.combobox_month_select.setCurrentIndex(0)
 
         vbox.addWidget(self.combobox_month_select)    
+    def __load_groupbox_index_selection__(self):
+        self.groupbox_index_choice = QtWidgets.QGroupBox("Choose performance index to show: ", self.frame )
+        self.groupbox_index_choice.setGeometry(QtCore.QRect(650, 450, 175, 100))
+        
+        vbox = QtWidgets.QVBoxLayout()
+        self.groupbox_index_choice.setLayout(vbox)
+
+        #Combobox
+        self.combobox_index_select = QtWidgets.QComboBox()
+        self.combobox_index_select.setGeometry(QtCore.QRect(700, 450 , 150, 25))
+        self.combobox_index_select.addItem('Net Profit')
+        self.combobox_index_select.addItem('Drawdown')
+        
+
+        self.combobox_index_select.setCurrentIndex(0)
+        self.combobox_index_select.currentTextChanged.connect(self.performance_index_onChange)
+
+        vbox.addWidget(self.combobox_index_select)
     #Previous button handler method
     def prev_btn_onClick(self):
-        print("Button Previous pressed.")
         self.current_page_shown -=1
         #SHOW ON CHART
         #Check page
@@ -155,10 +171,11 @@ class TemporalAnalysisWindow:
             self.next_btn.setEnabled(False)
         else:
             self.next_btn.setEnabled(True)
-        self.load_data_on_chart(self.book, self.current_page_shown)
+            
+        current_perf_index = self.combobox_index_select.currentText()
+        self.load_data_on_chart(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
     #Next button handler method    
     def next_btn_onClick(self):
-        print("Button Next pressed.")
         self.current_page_shown +=1
         #SHOW ON CHART
         #Check start of book
@@ -171,7 +188,9 @@ class TemporalAnalysisWindow:
             self.next_btn.setEnabled(False)
         else:
             self.next_btn.setEnabled(True)  
-        self.load_data_on_chart(self.book, self.current_page_shown)
+
+        current_perf_index = self.combobox_index_select.currentText()
+        self.load_data_on_chart(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
     #Radiobutton Handlers
     def monthly_choice_rb_onClick(self):
         self.groupbox_month_choice.setVisible(False)
@@ -179,6 +198,11 @@ class TemporalAnalysisWindow:
     def yearly_choice_rb_onClick(self):
         self.groupbox_year_choice.setVisible(False)
         self.groupbox_month_choice.setVisible(False)    
+    def performance_index_onChange(self):
+        current_perf_index = self.combobox_index_select.currentText()
+        dict_map = {'Net Profit' : 0, 'Drawdown': 1}
+        self.load_data_on_chart(self.book, self.current_page_shown, dict_map[current_perf_index])
+        print("Current selected index is: ", dict_map[current_perf_index])
     #Detect temporal view: YEARS - MONTHS - DAYS analyzing the data
     def __detect_initial_temporal_view__(self):
         tss = TradingSystemSchema()
@@ -260,22 +284,43 @@ class TemporalAnalysisWindow:
                     page.append(year_of_trades)
                     i +=1
     #Print data collected in a book on canvas chart
-    def load_data_on_chart(self, book, index_page_to_show):
+    def load_data_on_chart(self, book, index_page_to_show, _performance_index):
         #la pagina contiene i dati
         page_to_show = book[index_page_to_show]
         x_list = []
         y_list = []
         colors = []
-        for tby in page_to_show:
-            y_list.append(tby.getEquity())
-            x_list.append(tby.year)
-            if(tby.getEquity() > 0):
-                colors.append('g') 
-            else:
+        performance_index = _performance_index
+        print("Loading on chart: ", performance_index)
+        #Load data by index
+        if performance_index == 0:
+            print("Load NP")
+            for tby in page_to_show:
+                y_list.append(tby.getEquity())
+                x_list.append(tby.year)
+                if(tby.getEquity() > 0):
+                    colors.append('g') 
+                else:
+                    colors.append('r')
+        elif performance_index == 1:
+            print("Load DD")
+            for tby in page_to_show:
+                y_list.append(tby.getDrawdown())
+                x_list.append(tby.year)
                 colors.append('r')
+        else:
+            x_list = [0, 0, 0, 0]
+            y_list = [0, 0, 0, 0]
+            colors = ['r', 'r', 'r', 'r']
         
+        for y in y_list:
+            print(y)
+        print("------------")
+        for x in x_list:
+            print(x)
         self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
         self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
+        self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
         self.canvas_chart.setParent(self.frame)
         self.canvas_chart.show()
     #Print some book data
@@ -340,6 +385,13 @@ class TradesByYear:
             return 0
         else:
             return equity.calculate()
+    #Return the equity of this year
+    def getDrawdown(self):
+        dd = MaximumDrawdown(self.trade_list)
+        if not self.trade_list:
+            return 0
+        else:
+            return dd.calculate()
     #Print some data
     def print_data(self):
         print("Year: ", self.year)
