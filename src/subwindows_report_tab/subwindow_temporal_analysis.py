@@ -198,9 +198,13 @@ class TemporalAnalysisWindow:
     def monthly_choice_rb_onClick(self):
         self.groupbox_month_choice.setVisible(False)
         self.groupbox_year_choice.setVisible(True)
+
+        self.load_data_as_book(12)
     def yearly_choice_rb_onClick(self):
         self.groupbox_year_choice.setVisible(False)
-        self.groupbox_month_choice.setVisible(False)    
+        self.groupbox_month_choice.setVisible(False) 
+
+        self.load_data_as_book(4)   
     def performance_index_onChange(self):
         current_perf_index = self.combobox_index_select.currentText()
         dict_map = {'Net Profit' : 0, 'Drawdown': 1}
@@ -239,8 +243,68 @@ class TemporalAnalysisWindow:
         tss = TradingSystemSchema()
         self.book = []
         
+        #Filter trades per MONTH
         if self.monthly_choice_rb.isChecked():
             print("Start Monthly filtering")
+            first_date_resetted = CompleteDate(1,
+                            trades[0][tss.date_index_column][0:2],
+                              trades[0][tss.date_index_column][6:11],
+                                0,
+                                    0)
+            last_date_resetted = CompleteDate(1,
+                            trades[-1][tss.date_index_column][0:2],
+                                trades[-1][tss.date_index_column][6:11],
+                                0,
+                                    0)
+            list_of_years = []
+            list_of_months = []
+            #Create a list of months in years <empty>
+            for y in range(first_date_resetted.y, last_date_resetted.y + 1):
+                for m in range(0, 12):
+                    list_of_months.append(TradesByMonth(m))
+                list_of_years.append(list_of_months)
+                list_of_months = []
+            #Fill a list of years <empty>
+            for trade in trades:
+                current_date = CompleteDate(trade[tss.date_index_column][0:2],
+                                                trade[tss.date_index_column][3:5],
+                                                    trade[tss.date_index_column][6:11],
+                                                        0,
+                                                            0)
+                current_year = current_date.y
+                current_month = current_date.m
+                #inserire il trade nella lista dell'anno <current_year>
+                print("year ", int(current_year-first_date_resetted.y))
+                print("month ", int(current_month-1))
+                list_of_years[int(current_year-first_date_resetted.y)][int(current_month-1)].add_trade(trade)
+                i = 0
+                page = []
+                for year_of_trades in list_of_years:
+                    for month_of_trade in year_of_trades:
+                        #Paginazione per ANNO
+                        if i < 12 :
+                            page.append(month_of_trade)
+                            i +=1
+                            #Controllo se è l'ultimo anno
+                            if year_of_trades.year == list_of_years[-1].year:
+                                if month_of_trade.month == year_of_trades[-1].month:
+                                    self.book.append(page)
+                        else:
+                            i = 0
+                            self.book.append(page)
+                            page = []
+                            page.append(month_of_trade)
+                            i +=1
+                lines = []
+                y_ = 0
+                for y in list_of_years:
+                    for m in y:
+                        for trade in m.trade_list:
+                            lines.append("Year<", y_, "> month<" , m.month, "> ", trade)
+                dumpfile = open("dump.txt","w") 
+                dumpfile.writelines(lines)
+                dumpfile.close()
+        #Filter trades per YEAR
         elif self.yearly_choice_rb.isChecked():
             print("Start Yearly filtering")
             first_date_resetted = CompleteDate(1,
@@ -253,8 +317,7 @@ class TemporalAnalysisWindow:
                                 trades[-1][tss.date_index_column][6:11],
                                 0,
                                     0)
-            year_counter = last_date_resetted.internal_date
-            YEAR_IN_MINS = 525600
+
             list_of_trade_by_years = []
             #Create a list of years <empty>
             for y in range(first_date_resetted.y, last_date_resetted.y + 1):
@@ -294,10 +357,8 @@ class TemporalAnalysisWindow:
         y_list = []
         colors = []
         performance_index = _performance_index
-        print("Loading on chart: ", performance_index)
         #Load data by index
         if performance_index == 0:
-            print("Load NP")
             for tby in page_to_show:
                 y_list.append(tby.getEquity())
                 x_list.append(tby.year)
@@ -306,7 +367,6 @@ class TemporalAnalysisWindow:
                 else:
                     colors.append('r')
         elif performance_index == 1:
-            print("Load DD")
             for tby in page_to_show:
                 y_list.append(tby.getDrawdown())
                 x_list.append(tby.year)
@@ -316,11 +376,6 @@ class TemporalAnalysisWindow:
             y_list = [0, 0, 0, 0]
             colors = ['r', 'r', 'r', 'r']
         
-        for y in y_list:
-            print(y)
-        print("------------")
-        for x in x_list:
-            print(x)
         self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
         self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
         self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
@@ -335,32 +390,8 @@ class TemporalAnalysisWindow:
                 print("Year_data: ", year_in_page.year)
             p_ += 1
 class TradesByMonth:
-    def __init__(self,_year):
-        self.year = _year
-        #This list has 12 elements < from jan-0 to dec 11>
-        self.months = []
-        for i in range(0, 12):
-            self.months.append(MonthOfTrades())
-    #Add a single trade to a specified month
-    def add_trade_to_month(self, m, value):
-        self.months[m].append(value)
-    #Print data about trade deep to single trade
-    def print_data_deep(self):
-        i = 0
-        for mot in self.months:
-            print("Month ", i, "of year ", mot.year, " has trade: ")
-            for trade in mot.trade_list:
-                print(trade)
-            print("--------------------")    
-            i +=1
-    #Print data about trade deep to single month
-    def print_data(self):
-        i = 0
-        for mot in self.months:
-            print("Month ", i, "of year ", mot.year, " has trade: ")
-            i +=1
-class MonthOfTrades:
-    def __init__(self):
+    def __init__(self, _month):
+        self.month = _month
         self.trade_list = []
     #Add single trade to the year of trade
     def add_trade(self, trade):
