@@ -58,7 +58,10 @@ class TemporalAnalysisWindow:
         self.next_btn = QtWidgets.QPushButton(self.frame)
         self.next_btn.setGeometry(QtCore.QRect((self.frame.size().width() / 2), int(self.frame.size().height() *0.57), 100, 40))
         self.next_btn.setText("Next page =>")
-        
+        #Separator
+        self.separator = QtWidgets.QLabel(self.frame)
+        self.separator.setText("__________________________________________________________")
+        self.separator.setGeometry(QtCore.QRect((self.frame.size().width() / 3.25), int(self.frame.size().height() *0.60), 800, 100))
         
         #Groupbox_loaders
         self.__load_groupbox_temp_selection__()
@@ -75,8 +78,8 @@ class TemporalAnalysisWindow:
         #Set the initial groupbox state
         self.yearly_choice_rb_onClick()
     def __load_groupbox_temp_selection__(self):
-        self.groupbox_temp_choice = QtWidgets.QGroupBox("Choose temporal window", self.frame )
-        self.groupbox_temp_choice.setGeometry(QtCore.QRect(50, 450, 175, 100))
+        self.groupbox_temp_choice = QtWidgets.QGroupBox("Choose temporal window:", self.frame )
+        self.groupbox_temp_choice.setGeometry(QtCore.QRect(25, 450, 175, 100))
         
         vbox = QtWidgets.QVBoxLayout()
         self.groupbox_temp_choice.setLayout(vbox)
@@ -84,22 +87,22 @@ class TemporalAnalysisWindow:
         #RadioButton
         self.monthly_choice_rb = QtWidgets.QRadioButton()
         self.monthly_choice_rb.setGeometry(QtCore.QRect(100, 450, 100, 40))
-        self.monthly_choice_rb.setText("Monthly")
+        self.monthly_choice_rb.setText("Month")
         self.monthly_choice_rb.setEnabled(True)
         self.monthly_choice_rb.setChecked(False)
 
         #RadioButton
         self.yearly_choice_rb = QtWidgets.QRadioButton()
         self.yearly_choice_rb.setGeometry(QtCore.QRect(100, 475, 100, 40))
-        self.yearly_choice_rb.setText("Yearly")
+        self.yearly_choice_rb.setText("Year")
         self.yearly_choice_rb.setEnabled(True)
         self.yearly_choice_rb.setChecked(True)
 
         vbox.addWidget(self.monthly_choice_rb)
         vbox.addWidget(self.yearly_choice_rb)
     def __load_groupbox_year_selection__(self):
-        self.groupbox_year_choice = QtWidgets.QGroupBox("Choose year to show", self.frame )
-        self.groupbox_year_choice.setGeometry(QtCore.QRect(250, 450, 175, 100))
+        self.groupbox_year_choice = QtWidgets.QGroupBox("Choose year: ", self.frame )
+        self.groupbox_year_choice.setGeometry(QtCore.QRect(225, 450, 175, 100))
         
         vbox = QtWidgets.QVBoxLayout()
         self.groupbox_year_choice.setLayout(vbox)
@@ -115,8 +118,8 @@ class TemporalAnalysisWindow:
 
         vbox.addWidget(self.combobox_year_select)
     def __load_groupbox_month_selection__(self):
-        self.groupbox_month_choice = QtWidgets.QGroupBox("Choose month to show", self.frame )
-        self.groupbox_month_choice.setGeometry(QtCore.QRect(450, 450, 175, 100))
+        self.groupbox_month_choice = QtWidgets.QGroupBox("Choose month: ", self.frame )
+        self.groupbox_month_choice.setGeometry(QtCore.QRect(425, 450, 175, 100))
         
         vbox = QtWidgets.QVBoxLayout()
         self.groupbox_month_choice.setLayout(vbox)
@@ -141,8 +144,8 @@ class TemporalAnalysisWindow:
 
         vbox.addWidget(self.combobox_month_select)    
     def __load_groupbox_index_selection__(self):
-        self.groupbox_index_choice = QtWidgets.QGroupBox("Choose performance index to show: ", self.frame )
-        self.groupbox_index_choice.setGeometry(QtCore.QRect(650, 450, 175, 100))
+        self.groupbox_index_choice = QtWidgets.QGroupBox("Choose performance index: ", self.frame )
+        self.groupbox_index_choice.setGeometry(QtCore.QRect(635, 450, 175, 100))
         
         vbox = QtWidgets.QVBoxLayout()
         self.groupbox_index_choice.setLayout(vbox)
@@ -171,7 +174,7 @@ class TemporalAnalysisWindow:
             self.next_btn.setEnabled(False)
         else:
             self.next_btn.setEnabled(True)
-            
+
         current_perf_index = self.combobox_index_select.currentText()
         self.load_data_on_chart(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
     #Next button handler method    
