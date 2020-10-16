@@ -250,7 +250,7 @@ class TemporalAnalysisWindow:
             self.load_data_on_chart_month(self.book, self.current_page_shown, dict_map[current_perf_index])
         elif self.current_time_view == 'y':
             self.load_data_on_chart_year(self.book, self.current_page_shown, dict_map[current_perf_index])
-        print("Current selected index is: ", dict_map[current_perf_index])
+        print("[INFO] Current selected index is: ", dict_map[current_perf_index])
     #Detect temporal view: YEARS - MONTHS - DAYS analyzing the data
     def __detect_initial_temporal_view__(self):
         tss = TradingSystemSchema()
@@ -265,8 +265,6 @@ class TemporalAnalysisWindow:
                                       self.trade_list[-1][date_index][6:11],
                                         self.trade_list[-1][date_index][11:13],
                                           self.trade_list[-1][date_index][14:])
-        print("First date of trade-> ", first_date.internal_date)
-        print("Last date of trade-> ", last_date.internal_date)
 
         YEAR_ANALSYSIS_SOIL = 525600
 
@@ -289,7 +287,6 @@ class TemporalAnalysisWindow:
         
         #Filter trades per MONTH
         if self.monthly_choice_rb.isChecked():
-            print("Start Monthly filtering")
             first_date_resetted = CompleteDate(1,
                             trades[0][tss.date_index_column][0:2],
                               trades[0][tss.date_index_column][6:11],
@@ -343,7 +340,6 @@ class TemporalAnalysisWindow:
             print("Book has len ", len(self.book))
         #Filter trades per YEAR
         elif self.yearly_choice_rb.isChecked():
-            print("Start Yearly filtering")
             first_date_resetted = CompleteDate(1,
                             1,
                               trades[0][tss.date_index_column][6:11],
