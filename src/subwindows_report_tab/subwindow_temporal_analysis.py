@@ -28,7 +28,7 @@ class TemporalAnalysisWindow:
 
         
         self.__gui_load__()
-        self.__detect_initial_temporal_view__()
+        self.current_time_view = self.__detect_initial_temporal_view__()
         self.load_data_as_book(bar_per_page = 4)
         #Set next button state
         if len(self.book) == 1:
@@ -40,7 +40,10 @@ class TemporalAnalysisWindow:
         self.frame.show()
         #Setting the chart inside the canvas obj
         self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
-        self.load_data_on_chart(self.book, 0, 0)
+        if self.current_time_view == 'y':
+            self.load_data_on_chart_year(self.book, 0, 0)
+        elif self.current_time_view == 'm':
+            self.load_data_on_chart_month(self.book, 12, 0)
     #Load GUI elements
     def __gui_load__(self):
         self.frame = QtWidgets.QMainWindow()
@@ -61,7 +64,7 @@ class TemporalAnalysisWindow:
         #Separator
         self.separator = QtWidgets.QLabel(self.frame)
         self.separator.setText("__________________________________________________________")
-        self.separator.setGeometry(QtCore.QRect((self.frame.size().width() / 3.25), int(self.frame.size().height() *0.60), 800, 100))
+        self.separator.setGeometry(QtCore.QRect((self.frame.size().width() / 3.25), int(self.frame.size().height() *0.70), 800, 25))
         
         #Groupbox_loaders
         self.__load_groupbox_temp_selection__()
@@ -176,7 +179,10 @@ class TemporalAnalysisWindow:
             self.next_btn.setEnabled(True)
 
         current_perf_index = self.combobox_index_select.currentText()
-        self.load_data_on_chart(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+        if self.current_time_view == 'y':
+            self.load_data_on_chart_year(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+        elif self.current_time_view == 'm':
+            self.load_data_on_chart_month(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
     #Next button handler method    
     def next_btn_onClick(self):
         self.current_page_shown +=1
@@ -193,22 +199,57 @@ class TemporalAnalysisWindow:
             self.next_btn.setEnabled(True)  
 
         current_perf_index = self.combobox_index_select.currentText()
-        self.load_data_on_chart(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+        if self.current_time_view == 'y':
+            self.load_data_on_chart_year(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+        elif self.current_time_view == 'm':
+            self.load_data_on_chart_month(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
     #Radiobutton Handlers
     def monthly_choice_rb_onClick(self):
         self.groupbox_month_choice.setVisible(False)
         self.groupbox_year_choice.setVisible(True)
 
         self.load_data_as_book(12)
+
+        #Check page
+        self.prev_btn.setEnabled(False)
+        if self.current_page_shown == len(self.book)-1:
+            self.next_btn.setEnabled(False)
+        else:
+            self.next_btn.setEnabled(True)
+
+        #Set time window and page
+        self.current_page_shown = 0
+        self.current_time_view = 'm'
+        #reset combobox
+        self.combobox_index_select.setCurrentIndex(0)
+        self.load_data_on_chart_month(self.book, self.current_page_shown, 0)
     def yearly_choice_rb_onClick(self):
         self.groupbox_year_choice.setVisible(False)
-        self.groupbox_month_choice.setVisible(False) 
+        self.groupbox_month_choice.setVisible(False)
+        
+        self.load_data_as_book(4)
 
-        self.load_data_as_book(4)   
+        #Check page
+        self.prev_btn.setEnabled(False)
+        if self.current_page_shown == len(self.book)-1:
+            self.next_btn.setEnabled(False)
+        else:
+            self.next_btn.setEnabled(True)
+        #Set time window and page
+        self.current_time_view = 'y' 
+        self.current_page_shown = 0
+        #reset combobox
+        self.combobox_index_select.setCurrentIndex(0)
+
+        
+        self.load_data_on_chart_year(self.book, self.current_page_shown, 0)
     def performance_index_onChange(self):
         current_perf_index = self.combobox_index_select.currentText()
         dict_map = {'Net Profit' : 0, 'Drawdown': 1}
-        self.load_data_on_chart(self.book, self.current_page_shown, dict_map[current_perf_index])
+        if self.current_time_view == 'm':
+            self.load_data_on_chart_month(self.book, self.current_page_shown, dict_map[current_perf_index])
+        elif self.current_time_view == 'y':
+            self.load_data_on_chart_year(self.book, self.current_page_shown, dict_map[current_perf_index])
         print("Current selected index is: ", dict_map[current_perf_index])
     #Detect temporal view: YEARS - MONTHS - DAYS analyzing the data
     def __detect_initial_temporal_view__(self):
@@ -234,9 +275,12 @@ class TemporalAnalysisWindow:
         if date_diff > YEAR_ANALSYSIS_SOIL:
             self.yearly_choice_rb_onClick()
             print("[INFO] Temporal window automatically chosen is: Yearly")
+            return 'y'
+
         else:
             self.monthly_choice_rb_onClick()
             print("[INFO] Temporal window automatically chosen is: Monthly")
+            return 'm'
     #Load data on chart as book, collection of pages->collection of TradesByYear->Collection of trades
     def load_data_as_book(self, bar_per_page):
         trades = deepcopy(self.trade_list)
@@ -261,49 +305,42 @@ class TemporalAnalysisWindow:
             #Create a list of months in years <empty>
             for y in range(first_date_resetted.y, last_date_resetted.y + 1):
                 for m in range(0, 12):
-                    list_of_months.append(TradesByMonth(m))
+                    list_of_months.append(TradesByMonth(m, y))
                 list_of_years.append(list_of_months)
                 list_of_months = []
             #Fill a list of years <empty>
             for trade in trades:
-                current_date = CompleteDate(trade[tss.date_index_column][0:2],
-                                                trade[tss.date_index_column][3:5],
+                current_date = CompleteDate(trade[tss.date_index_column][3:5],
+                                                trade[tss.date_index_column][0:2],
                                                     trade[tss.date_index_column][6:11],
                                                         0,
                                                             0)
                 current_year = current_date.y
                 current_month = current_date.m
                 #inserire il trade nella lista dell'anno <current_year>
-                print("year ", int(current_year-first_date_resetted.y))
-                print("month ", int(current_month-1))
                 list_of_years[int(current_year-first_date_resetted.y)][int(current_month-1)].add_trade(trade)
                 i = 0
                 page = []
-                for year_of_trades in list_of_years:
-                    for month_of_trade in year_of_trades:
-                        #Paginazione per ANNO
-                        if i < 12 :
-                            page.append(month_of_trade)
-                            i +=1
-                            #Controllo se è l'ultimo anno
-                            if year_of_trades.year == list_of_years[-1].year:
-                                if month_of_trade.month == year_of_trades[-1].month:
-                                    self.book.append(page)
-                        else:
-                            i = 0
-                            self.book.append(page)
-                            page = []
-                            page.append(month_of_trade)
-                            i +=1
-                lines = []
-                y_ = 0
-                for y in list_of_years:
-                    for m in y:
-                        for trade in m.trade_list:
-                            lines.append("Year<", y_, "> month<" , m.month, "> ", trade)
-                dumpfile = open("dump.txt","w") 
-                dumpfile.writelines(lines)
-                dumpfile.close()
+            for year_of_trades in list_of_years:
+                for month_of_trade in year_of_trades:
+                    #Paginazione per ANNO
+                    if i < bar_per_page :
+                        page.append(month_of_trade)
+                        #stringy = "Element<" + str(i) + "> has been added to page " + str(p_) + ".\n"
+                        i +=1
+                        #Controllo se è l'ultimo anno
+                        if month_of_trade.year ==  year_of_trades[-1].month:
+                            if month_of_trade.month == year_of_trades[-1].month:
+                                self.book.append(page)
+                                #stringy ="Page< "+ str(p_) + "added to book." +"\n"
+                    else:
+                        i = 0
+                        self.book.append(page)
+                        #stringy ="Page< "+ str(p_) + "added to book." +"\n"
+                        page = []
+                        page.append(month_of_trade)
+                        i +=1
+            print("Book has len ", len(self.book))
         #Filter trades per YEAR
         elif self.yearly_choice_rb.isChecked():
             print("Start Yearly filtering")
@@ -332,8 +369,8 @@ class TemporalAnalysisWindow:
                 current_year = current_date.y
                 #inserire il trade nella lista dell'anno <current_year>
                 list_of_trade_by_years[int(current_year-first_date_resetted.y)].add_trade(trade)
-            #Print data on chart as a book
             
+            #Print data on chart as a book
             i = 0
             page = []
             for year_of_trades in list_of_trade_by_years:
@@ -350,7 +387,7 @@ class TemporalAnalysisWindow:
                     page.append(year_of_trades)
                     i +=1
     #Print data collected in a book on canvas chart
-    def load_data_on_chart(self, book, index_page_to_show, _performance_index):
+    def load_data_on_chart_year(self, book, index_page_to_show, _performance_index):
         #la pagina contiene i dati
         page_to_show = book[index_page_to_show]
         x_list = []
@@ -377,24 +414,65 @@ class TemporalAnalysisWindow:
             colors = ['r', 'r', 'r', 'r']
         
         self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
-        self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
+        if len(page_to_show) <12:
+            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
+        else:
+            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.10) #xList, ylist, align, list_of_colors
         self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
         self.canvas_chart.setParent(self.frame)
         self.canvas_chart.show()
-    #Print some book data
-    def print_book_data(self):
-        p_ = 0
-        for page in self.book:
-            print("Page ", p_ , " contains:")
-            for year_in_page in page:
-                print("Year_data: ", year_in_page.year)
-            p_ += 1
+
+        print("Page shown is: ", index_page_to_show, " on ", len(self.book)-1)
+    #Print data collected in a book on canvas chart
+    def load_data_on_chart_month(self, book, index_page_to_show, _performance_index):
+        #la pagina contiene i dati
+        page_to_show = book[index_page_to_show]
+        x_list = []
+        y_list = []
+        colors = []
+        performance_index = _performance_index
+        #Load data by index
+        if performance_index == 0:
+            for tby in page_to_show:
+                y_list.append(tby.getEquity())
+                x_list.append(tby.month)
+                if(tby.getEquity() > 0):
+                    colors.append('g') 
+                else:
+                    colors.append('r')
+        elif performance_index == 1:
+            for tby in page_to_show:
+                y_list.append(tby.getDrawdown())
+                x_list.append(tby.month)
+                colors.append('r')
+        else:
+            x_list = [0, 0, 0, 0]
+            y_list = [0, 0, 0, 0]
+            colors = ['r', 'r', 'r', 'r']
+        """
+        for x in x_list:
+            print(x)
+        print("---------------")
+        for y in y_list:
+            print(y)
+        """
+        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
+        if len(page_to_show) <12:
+            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
+        else:
+            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.10) #xList, ylist, align, list_of_colors
+        self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
+        self.canvas_chart.setParent(self.frame)
+        self.canvas_chart.show()
+
+        print("Page shown is: ", index_page_to_show, " on ", len(self.book)-1)
 class TradesByMonth:
-    def __init__(self, _month):
+    def __init__(self, _month, _year):
         self.month = _month
+        self.year = _year
         self.trade_list = []
     #Add single trade to the year of trade
-    def add_trade(self, trade):
+    def add_trade(self, _trade):
         trade = deepcopy(_trade)
         self.trade_list.append(trade)
     #Return the equity of this year
@@ -404,6 +482,13 @@ class TradesByMonth:
             return 0
         else:
             return equity.calculate()
+    #Return the equity of this year
+    def getDrawdown(self):
+        dd = MaximumDrawdown(self.trade_list)
+        if not self.trade_list:
+            return 0
+        else:
+            return dd.calculate()
 class TradesByYear:
     def __init__(self,_year):
         self.year = _year
