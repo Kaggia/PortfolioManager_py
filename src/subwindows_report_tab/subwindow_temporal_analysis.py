@@ -29,7 +29,7 @@ class TemporalAnalysisWindow:
         
         self.__gui_load__()
         self.current_time_view = self.__detect_initial_temporal_view__()
-        self.load_data_as_book(bar_per_page = 4)
+        self.load_data_as_book(bar_per_page = 6)
         #Set next button state
         if len(self.book) == 1:
             self.next_btn.setEnabled(False)
@@ -227,7 +227,7 @@ class TemporalAnalysisWindow:
         self.groupbox_year_choice.setVisible(False)
         self.groupbox_month_choice.setVisible(False)
         
-        self.load_data_as_book(4)
+        self.load_data_as_book(6)
 
         #Check page
         self.prev_btn.setEnabled(False)
@@ -305,6 +305,8 @@ class TemporalAnalysisWindow:
                     list_of_months.append(TradesByMonth(m, y))
                 list_of_years.append(list_of_months)
                 list_of_months = []
+
+
             #Fill a list of years <empty>
             for trade in trades:
                 current_date = CompleteDate(trade[tss.date_index_column][3:5],
@@ -318,6 +320,7 @@ class TemporalAnalysisWindow:
                 list_of_years[int(current_year-first_date_resetted.y)][int(current_month-1)].add_trade(trade)
                 i = 0
                 page = []
+        
             for year_of_trades in list_of_years:
                 for month_of_trade in year_of_trades:
                     #Paginazione per ANNO
@@ -326,8 +329,8 @@ class TemporalAnalysisWindow:
                         #stringy = "Element<" + str(i) + "> has been added to page " + str(p_) + ".\n"
                         i +=1
                         #Controllo se è l'ultimo anno
-                        if month_of_trade.year ==  year_of_trades[-1].month:
-                            if month_of_trade.month == year_of_trades[-1].month:
+                        if month_of_trade.year ==  list_of_years[-1][-1].year:
+                            if month_of_trade.month == list_of_years[-1][-1].month:
                                 self.book.append(page)
                                 #stringy ="Page< "+ str(p_) + "added to book." +"\n"
                     else:
@@ -335,7 +338,7 @@ class TemporalAnalysisWindow:
                         self.book.append(page)
                         #stringy ="Page< "+ str(p_) + "added to book." +"\n"
                         page = []
-                        page.append(month_of_trade)
+                        #page.append(month_of_trade)
                         i +=1
             print("Book has len ", len(self.book))
         #Filter trades per YEAR
@@ -409,7 +412,7 @@ class TemporalAnalysisWindow:
             y_list = [0, 0, 0, 0]
             colors = ['r', 'r', 'r', 'r']
         
-        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
+        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Profit/Loss", _xLabel="Years")
         if len(page_to_show) <12:
             self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
         else:
@@ -425,13 +428,14 @@ class TemporalAnalysisWindow:
         page_to_show = book[index_page_to_show]
         x_list = []
         y_list = []
+        MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         colors = []
         performance_index = _performance_index
         #Load data by index
         if performance_index == 0:
             for tby in page_to_show:
                 y_list.append(tby.getEquity())
-                x_list.append(tby.month)
+                x_list.append(MONTHS[int(tby.month)])
                 if(tby.getEquity() > 0):
                     colors.append('g') 
                 else:
@@ -452,16 +456,20 @@ class TemporalAnalysisWindow:
         for y in y_list:
             print(y)
         """
-        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Y", _xLabel="X")
+        x_label = "Months / Year: " + str(self.book[index_page_to_show][0].year)
+
+        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Profit/Loss", _xLabel=x_label)
         if len(page_to_show) <12:
             self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
         else:
-            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.10) #xList, ylist, align, list_of_colors
+            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
         self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
         self.canvas_chart.setParent(self.frame)
         self.canvas_chart.show()
 
         print("Page shown is: ", index_page_to_show, " on ", len(self.book)-1)
+
+        print("EXTRA, last year registered->" , self.book[-1][0].year)
 class TradesByMonth:
     def __init__(self, _month, _year):
         self.month = _month
