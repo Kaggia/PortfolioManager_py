@@ -411,12 +411,23 @@ class TemporalAnalysisWindow:
             x_list = [0, 0, 0, 0]
             y_list = [0, 0, 0, 0]
             colors = ['r', 'r', 'r', 'r']
-        
+        #print the page
         self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Profit/Loss", _xLabel="Years")
         if len(page_to_show) <12:
             self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
         else:
             self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.10) #xList, ylist, align, list_of_colors
+        #Print values on bars
+        y_pos = 0
+        for index, value in enumerate(y_list):
+            
+            if value >= 0:
+                y_pos = value + 40
+            else:
+                y_pos = value - 40
+            self.canvas_chart.axes.text(y=y_pos, x=index, s=str(value), color='green', va='center', fontweight='bold') 
+            print(index, value, y_pos)
+        
         self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
         self.canvas_chart.setParent(self.frame)
         self.canvas_chart.show()
@@ -463,6 +474,16 @@ class TemporalAnalysisWindow:
             self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
         else:
             self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
+        
+        #Print values on bars
+        y_pos = 0
+        for index, value in enumerate(y_list):
+            if value >= 0:
+                y_pos = value + 40
+            else:
+                y_pos = value - 40
+            self.canvas_chart.axes.text(y=y_pos, x=index, s=str(value), color='green', va='center', fontweight='bold') 
+
         self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
         self.canvas_chart.setParent(self.frame)
         self.canvas_chart.show()
