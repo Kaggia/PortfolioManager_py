@@ -113,13 +113,9 @@ class TemporalAnalysisWindow:
         #Combobox
         self.combobox_year_select = QtWidgets.QComboBox()
         self.combobox_year_select.setGeometry(QtCore.QRect(300, 450 , 150, 25))
-        self.combobox_year_select.addItem('2000')
-        self.combobox_year_select.addItem('2001')
-        self.combobox_year_select.addItem('2002')
-
-        self.combobox_year_select.setCurrentIndex(0)
 
         vbox.addWidget(self.combobox_year_select)
+        self.combobox_year_select.currentTextChanged.connect(self.year_selection_cbox_onChange)  
     def __load_groupbox_month_selection__(self):
         self.groupbox_month_choice = QtWidgets.QGroupBox("Choose month: ", self.frame )
         self.groupbox_month_choice.setGeometry(QtCore.QRect(425, 450, 175, 100))
@@ -164,6 +160,34 @@ class TemporalAnalysisWindow:
         self.combobox_index_select.currentTextChanged.connect(self.performance_index_onChange)
 
         vbox.addWidget(self.combobox_index_select)
+    #Detect temporal view: YEARS - MONTHS - DAYS analyzing the data
+    def __detect_initial_temporal_view__(self):
+        tss = TradingSystemSchema()
+        date_index = tss.date_index_column
+        first_date = CompleteDate(self.trade_list[0][date_index][0:2],
+                                    self.trade_list[0][date_index][3:5],
+                                      self.trade_list[0][date_index][6:11],
+                                        self.trade_list[0][date_index][11:13],
+                                          self.trade_list[0][date_index][14:])
+        last_date = CompleteDate(self.trade_list[-1][date_index][0:2],
+                                    self.trade_list[-1][date_index][3:5],
+                                      self.trade_list[-1][date_index][6:11],
+                                        self.trade_list[-1][date_index][11:13],
+                                          self.trade_list[-1][date_index][14:])
+
+        YEAR_ANALSYSIS_SOIL = 525600
+
+        date_diff = last_date.internal_date - first_date.internal_date
+
+        if date_diff > YEAR_ANALSYSIS_SOIL:
+            self.yearly_choice_rb_onClick()
+            print("[INFO] Temporal window automatically chosen is: Yearly")
+            return 'y'
+
+        else:
+            self.monthly_choice_rb_onClick()
+            print("[INFO] Temporal window automatically chosen is: Monthly")
+            return 'm'
     #Previous button handler method
     def prev_btn_onClick(self):
         self.current_page_shown -=1
@@ -223,6 +247,7 @@ class TemporalAnalysisWindow:
         #reset combobox
         self.combobox_index_select.setCurrentIndex(0)
         self.load_data_on_chart_month(self.book, self.current_page_shown, 0)
+        self.load_data_on_combobox_year_selection()
     def yearly_choice_rb_onClick(self):
         self.groupbox_year_choice.setVisible(False)
         self.groupbox_month_choice.setVisible(False)
@@ -242,7 +267,27 @@ class TemporalAnalysisWindow:
         self.combobox_index_select.setCurrentIndex(0)
 
         
-        self.load_data_on_chart_year(self.book, self.current_page_shown, 0)
+        self.load_data_on_chart_year(self.book, self.current_page_shown, 0)    
+    def year_selection_cbox_onChange(self):
+        year_selected_str = self.combobox_year_select.currentText()
+        if year_selected_str != '':
+            year_selected = int(year_selected_str)
+            first_year = int(self.book[0][0].year)
+
+            current_perf_index = self.combobox_index_select.currentText()
+            
+            self.load_data_on_chart_month(self.book, year_selected-first_year, self.dict_performance_index[current_perf_index])
+            #Update buttons
+            if self.current_page_shown == 0:
+                self.prev_btn.setEnabled(False)
+            else:
+                self.prev_btn.setEnabled(True)
+            if self.current_page_shown == len(self.book)-1:
+                self.next_btn.setEnabled(False)
+            else:
+                self.next_btn.setEnabled(True)
+        else:
+            print("[ERROR] Current year selected is not valid.")
     def performance_index_onChange(self):
         current_perf_index = self.combobox_index_select.currentText()
         dict_map = {'Net Profit' : 0, 'Drawdown': 1}
@@ -251,34 +296,13 @@ class TemporalAnalysisWindow:
         elif self.current_time_view == 'y':
             self.load_data_on_chart_year(self.book, self.current_page_shown, dict_map[current_perf_index])
         print("[INFO] Current selected index is: ", dict_map[current_perf_index])
-    #Detect temporal view: YEARS - MONTHS - DAYS analyzing the data
-    def __detect_initial_temporal_view__(self):
-        tss = TradingSystemSchema()
-        date_index = tss.date_index_column
-        first_date = CompleteDate(self.trade_list[0][date_index][0:2],
-                                    self.trade_list[0][date_index][3:5],
-                                      self.trade_list[0][date_index][6:11],
-                                        self.trade_list[0][date_index][11:13],
-                                          self.trade_list[0][date_index][14:])
-        last_date = CompleteDate(self.trade_list[-1][date_index][0:2],
-                                    self.trade_list[-1][date_index][3:5],
-                                      self.trade_list[-1][date_index][6:11],
-                                        self.trade_list[-1][date_index][11:13],
-                                          self.trade_list[-1][date_index][14:])
-
-        YEAR_ANALSYSIS_SOIL = 525600
-
-        date_diff = last_date.internal_date - first_date.internal_date
-
-        if date_diff > YEAR_ANALSYSIS_SOIL:
-            self.yearly_choice_rb_onClick()
-            print("[INFO] Temporal window automatically chosen is: Yearly")
-            return 'y'
-
-        else:
-            self.monthly_choice_rb_onClick()
-            print("[INFO] Temporal window automatically chosen is: Monthly")
-            return 'm'
+    #Load data of combobox year selection
+    def load_data_on_combobox_year_selection(self):
+        self.combobox_year_select.clear()
+        for page in self.book:
+            year_to_add = str(page[0].year)
+            self.combobox_year_select.addItem(year_to_add)
+        self.combobox_year_select.setCurrentIndex(0)   
     #Load data on chart as book, collection of pages->collection of TradesByYear->Collection of trades
     def load_data_as_book(self, bar_per_page):
         trades = deepcopy(self.trade_list)
@@ -420,19 +444,18 @@ class TemporalAnalysisWindow:
         #Print values on bars
         y_pos = 0
         for index, value in enumerate(y_list):
-            
             if value >= 0:
-                y_pos = value + 40
+                y_pos = value +40
             else:
-                y_pos = value - 40
-            self.canvas_chart.axes.text(y=y_pos, x=index, s=str(value), color='green', va='center', fontweight='bold') 
-            print(index, value, y_pos)
-        
+                y_pos = value -40
+            self.canvas_chart.axes.text(y=y_pos, x=index, s=str(value), color='black', va='center', fontweight='bold') 
+
         self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
         self.canvas_chart.setParent(self.frame)
         self.canvas_chart.show()
 
         print("Page shown is: ", index_page_to_show, " on ", len(self.book)-1)
+        self.current_page_shown = index_page_to_show
     #Print data collected in a book on canvas chart
     def load_data_on_chart_month(self, book, index_page_to_show, _performance_index):
         #la pagina contiene i dati
@@ -479,18 +502,17 @@ class TemporalAnalysisWindow:
         y_pos = 0
         for index, value in enumerate(y_list):
             if value >= 0:
-                y_pos = value + 40
+                y_pos = value +40
             else:
-                y_pos = value - 40
-            self.canvas_chart.axes.text(y=y_pos, x=index, s=str(value), color='green', va='center', fontweight='bold') 
+                y_pos = value -40
+            self.canvas_chart.axes.text(y=y_pos, x=index, s=str(value), color='black', va='center', fontweight='bold') 
 
         self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
         self.canvas_chart.setParent(self.frame)
         self.canvas_chart.show()
 
         print("Page shown is: ", index_page_to_show, " on ", len(self.book)-1)
-
-        print("EXTRA, last year registered->" , self.book[-1][0].year)
+        self.current_page_shown = index_page_to_show
 class TradesByMonth:
     def __init__(self, _month, _year):
         self.month = _month
