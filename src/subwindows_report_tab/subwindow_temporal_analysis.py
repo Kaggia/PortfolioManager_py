@@ -436,24 +436,8 @@ class TemporalAnalysisWindow:
             y_list = [0, 0, 0, 0]
             colors = ['r', 'r', 'r', 'r']
         #print the page
-        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Profit/Loss", _xLabel="Years")
-        if len(page_to_show) <12:
-            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
-        else:
-            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.10) #xList, ylist, align, list_of_colors
-        #Print values on bars
-        y_pos = 0
-        for index, value in enumerate(y_list):
-            if value >= 0:
-                y_pos = value +40
-            else:
-                y_pos = value -40
-            self.canvas_chart.axes.text(y=y_pos, x=index, s=str(value), color='black', va='center', fontweight='bold') 
-
-        self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
-        self.canvas_chart.setParent(self.frame)
-        self.canvas_chart.show()
-
+        self.canvas_chart = MplCanvas(parent=self.frame, width=12, height=4, dpi=70, _yLabel="Profit/Loss", _xLabel="Years")
+        self.canvas_chart.load_and_display_bar_chart(x_axe_data=x_list, y_axe_data=y_list, color_axe=colors,  page_to_show=page_to_show)
         print("Page shown is: ", index_page_to_show, " on ", len(self.book)-1)
         self.current_page_shown = index_page_to_show
     #Print data collected in a book on canvas chart
@@ -492,25 +476,9 @@ class TemporalAnalysisWindow:
         """
         x_label = "Months / Year: " + str(self.book[index_page_to_show][0].year)
 
-        self.canvas_chart = MplCanvas(self.frame, width=12, height=4, dpi=70, _yLabel="Profit/Loss", _xLabel=x_label)
-        if len(page_to_show) <12:
-            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
-        else:
-            self.canvas_chart.axes.bar(x_list, y_list, align='center', color=colors, width=0.25) #xList, ylist, align, list_of_colors
-        
-        #Print values on bars
-        y_pos = 0
-        for index, value in enumerate(y_list):
-            if value >= 0:
-                y_pos = value +40
-            else:
-                y_pos = value -40
-            self.canvas_chart.axes.text(y=y_pos, x=index, s=str(value), color='black', va='center', fontweight='bold') 
-
-        self.canvas_chart.axes.axhline(y=0, color='black', linestyle='--')
-        self.canvas_chart.setParent(self.frame)
-        self.canvas_chart.show()
-
+        self.canvas_chart = MplCanvas(parent=self.frame, width=12, height=4, dpi=70, _yLabel="Profit/Loss", _xLabel=x_label)
+        #Load data on canvas and show 
+        self.canvas_chart.load_and_display_bar_chart(x_axe_data=x_list, y_axe_data=y_list, color_axe=colors, page_to_show=page_to_show)
         print("Page shown is: ", index_page_to_show, " on ", len(self.book)-1)
         self.current_page_shown = index_page_to_show
 class TradesByMonth:
