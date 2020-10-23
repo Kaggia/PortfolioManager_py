@@ -188,10 +188,8 @@ class TemporalAnalysisWindow:
             self.monthly_choice_rb_onClick()
             print("[INFO] Temporal window automatically chosen is: Monthly")
             return 'm'
-    #Previous button handler method
-    def prev_btn_onClick(self):
-        self.current_page_shown -=1
-        #SHOW ON CHART
+    #Check start and and of book
+    def __check_book_limits__(self):
         #Check page
         if self.current_page_shown == 0:
             self.prev_btn.setEnabled(False)
@@ -201,32 +199,25 @@ class TemporalAnalysisWindow:
             self.next_btn.setEnabled(False)
         else:
             self.next_btn.setEnabled(True)
-
+    #Previous button handler method
+    def prev_btn_onClick(self):
+        self.current_page_shown -=1
+        #SHOW ON CHART
+        #Check page
+        self.__check_book_limits__()
+        #set current index of performance
         current_perf_index = self.combobox_index_select.currentText()
-        if self.current_time_view == 'y':
-            self.load_data_on_chart_year(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
-        elif self.current_time_view == 'm':
-            self.load_data_on_chart_month(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+        #Load_chart based on time view
+        self.load_chart_basedOn_time_view()
     #Next button handler method    
     def next_btn_onClick(self):
         self.current_page_shown +=1
-        #SHOW ON CHART
-        #Check start of book
-        if self.current_page_shown == 0:
-            self.prev_btn.setEnabled(False)
-        else:
-            self.prev_btn.setEnabled(True)
-        #Check end of book
-        if self.current_page_shown == len(self.book)-1:
-            self.next_btn.setEnabled(False)
-        else:
-            self.next_btn.setEnabled(True)  
-
+        #Check page
+        self.__check_book_limits__()
+        #Select current index of performance
         current_perf_index = self.combobox_index_select.currentText()
-        if self.current_time_view == 'y':
-            self.load_data_on_chart_year(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
-        elif self.current_time_view == 'm':
-            self.load_data_on_chart_month(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+        #Load_chart based on time view
+        self.load_chart_basedOn_time_view()    
     #Radiobutton Handlers
     def monthly_choice_rb_onClick(self):
         self.groupbox_month_choice.setVisible(False)
@@ -255,11 +246,7 @@ class TemporalAnalysisWindow:
         self.load_data_as_book(6)
 
         #Check page
-        self.prev_btn.setEnabled(False)
-        if self.current_page_shown == len(self.book)-1:
-            self.next_btn.setEnabled(False)
-        else:
-            self.next_btn.setEnabled(True)
+        self.__check_book_limits__()
         #Set time window and page
         self.current_time_view = 'y' 
         self.current_page_shown = 0
@@ -278,14 +265,7 @@ class TemporalAnalysisWindow:
             
             self.load_data_on_chart_month(self.book, year_selected-first_year, self.dict_performance_index[current_perf_index])
             #Update buttons
-            if self.current_page_shown == 0:
-                self.prev_btn.setEnabled(False)
-            else:
-                self.prev_btn.setEnabled(True)
-            if self.current_page_shown == len(self.book)-1:
-                self.next_btn.setEnabled(False)
-            else:
-                self.next_btn.setEnabled(True)
+            self.__check_book_limits__()
         else:
             print("[ERROR] Current year selected is not valid.")
     def performance_index_onChange(self):
@@ -296,6 +276,12 @@ class TemporalAnalysisWindow:
         elif self.current_time_view == 'y':
             self.load_data_on_chart_year(self.book, self.current_page_shown, dict_map[current_perf_index])
         print("[INFO] Current selected index is: ", dict_map[current_perf_index])
+    #load chart based on time view 
+    def load_chart_basedOn_time_view(self):
+        if self.current_time_view == 'y':
+            self.load_data_on_chart_year(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+        elif self.current_time_view == 'm':
+            self.load_data_on_chart_month(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
     #Load data of combobox year selection
     def load_data_on_combobox_year_selection(self):
         self.combobox_year_select.clear()
