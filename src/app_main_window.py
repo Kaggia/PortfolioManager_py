@@ -4,6 +4,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from operator import itemgetter
 from copy import deepcopy
+import random
 import os
 import numpy as np
 import pandas as pd
@@ -13,7 +14,7 @@ from matplotlib.figure import Figure
 #My Modules
 import CONSTANTS as directory
 from os_interactors import FileManager
-from trading_system import TradingSystem
+from trading_system import TradingSystem, TradingSystemSchema
 from indexes import *
 from options import Option
 from date import Date
@@ -313,6 +314,9 @@ class MainWindow:
             #Add to portfolio
             ts_id = len(self.current_portfolio.trading_systems) + 1
             new_ts = TradingSystem(ts_id, selected_file)
+
+            new_ts = self.format_duplicate(new_ts)
+
             self.current_portfolio.add_system(new_ts)
             self.current_portfolio.scalings.append(new_ts.volume) #Set the current volume in scaling list
             #add to combobox
@@ -327,6 +331,19 @@ class MainWindow:
             #Activate loading button
             self.loadDetails_btn.setEnabled(True)  
             self.remove_system_btn.setEnabled(True)
+    #Check duplicated names in Ts list, change ts.name and every name in ts.trade_list
+    def format_duplicate(self, new_ts):
+        formatted_ts = deepcopy(new_ts)
+        tss = TradingSystemSchema()
+        label_index = tss.label_index_column
+        if self.current_portfolio:
+            for trading_system in self.current_portfolio.trading_systems:
+                if new_ts.name == trading_system.name:
+                    #La label di due ts è uguale
+                    formatted_ts.name = str(new_ts.symbol) + "_" + str(new_ts.market) + str(random.randint(1, 99999))
+                    for trade in formatted_ts.trade_list:
+                        trade[label_index] = formatted_ts.name
+        return formatted_ts  
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
         self.isQuantityChangedByMethod = True
