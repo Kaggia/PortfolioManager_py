@@ -1,8 +1,15 @@
 #Oggetto rappresentazione di una tab < report >
+#Importing a parent file.py
+import os,sys,inspect
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir) 
+#Python libs
 from PyQt5 import QtCore, QtGui, QtWidgets
+from copy import deepcopy
+#MyLibs
 from subwindows_report_tab import subwindow_trades_list
 from subwindows_report_tab import subwindow_temporal_analysis
-from copy import deepcopy
 from indexes import *
 
 #Instanciate and manage the report tab, printing all indexes

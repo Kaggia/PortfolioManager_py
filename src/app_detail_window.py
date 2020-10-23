@@ -1,6 +1,7 @@
 #app_detail_window.py
 #Libreria contenente la finestra secondaria, printing dei dati
 #Libraries
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from operator import itemgetter
 from copy import deepcopy
@@ -18,11 +19,11 @@ from indexes import *
 from options import Option
 from date import Date
 from date import reset_to_monday
-from tab_equity import EquityChartTab
-from tab_drawdown import DrawdownChartTab
-from tab_optimization import OptimizationTab
-from tab_options import OptionTab
-from tab_report import ReportTab
+from detail_window_tabs.tab_equity import EquityChartTab
+from detail_window_tabs.tab_drawdown import DrawdownChartTab
+from detail_window_tabs.tab_optimization import OptimizationTab
+from detail_window_tabs.tab_options import OptionTab
+from detail_window_tabs.tab_report import ReportTab
 from subwindows_report_tab import subwindow_trades_list
 
 #Window where various details are shown
