@@ -208,7 +208,7 @@ class TemporalAnalysisWindow:
         #set current index of performance
         current_perf_index = self.combobox_index_select.currentText()
         #Load_chart based on time view
-        self.load_chart_basedOn_time_view()
+        self.load_chart_basedOn_time_view(current_perf_index)
     #Next button handler method    
     def next_btn_onClick(self):
         self.current_page_shown +=1
@@ -217,7 +217,7 @@ class TemporalAnalysisWindow:
         #Select current index of performance
         current_perf_index = self.combobox_index_select.currentText()
         #Load_chart based on time view
-        self.load_chart_basedOn_time_view()    
+        self.load_chart_basedOn_time_view(current_perf_index)    
     #Radiobutton Handlers
     def monthly_choice_rb_onClick(self):
         self.groupbox_month_choice.setVisible(False)
@@ -277,11 +277,11 @@ class TemporalAnalysisWindow:
             self.load_data_on_chart_year(self.book, self.current_page_shown, dict_map[current_perf_index])
         print("[INFO] Current selected index is: ", dict_map[current_perf_index])
     #load chart based on time view 
-    def load_chart_basedOn_time_view(self):
+    def load_chart_basedOn_time_view(self, performance_index):
         if self.current_time_view == 'y':
-            self.load_data_on_chart_year(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+            self.load_data_on_chart_year(self.book, self.current_page_shown, self.dict_performance_index[performance_index])
         elif self.current_time_view == 'm':
-            self.load_data_on_chart_month(self.book, self.current_page_shown, self.dict_performance_index[current_perf_index])
+            self.load_data_on_chart_month(self.book, self.current_page_shown, self.dict_performance_index[performance_index])
     #Load data of combobox year selection
     def load_data_on_combobox_year_selection(self):
         self.combobox_year_select.clear()
