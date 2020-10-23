@@ -19,6 +19,7 @@ from options import Option
 from date import Date
 from date import reset_to_monday
 from app_detail_window import DetailWindow
+from app_help_window import HelpWindow
 
 #Main window where you can manage the whole portfolio
 class MainWindow:
@@ -98,6 +99,10 @@ class MainWindow:
         self.clearPortfolio = QtWidgets.QAction(self.frame)
         self.clearPortfolio.setText("Clear Portfolio")
         self.menuOptions.addAction(self.clearPortfolio)
+        #Action Help frame
+        self.openHelpFrame = QtWidgets.QAction(self.frame)
+        self.openHelpFrame.setText("About")
+        self.menuHelp.addAction(self.openHelpFrame)
     #Load the section relative to loading options
     def __load_loading_options__(self):
         #Label_loading_opt
@@ -298,6 +303,7 @@ class MainWindow:
         self.actionExitApp.triggered.connect(self.close_window_Onclik)
         self.addSystemOption.triggered.connect(self.add_system_btn_Onclick)
         self.clearPortfolio.triggered.connect(self.clear_portfolio_btn_Onclick)
+        self.openHelpFrame.triggered.connect(self.help_menu_btn_OnClick)
         #Action in combobox
         self.remove_selected_item_cbox.currentTextChanged.connect(self.__load_summary_trading_system__)       
     #ADD_SYSTEM_BUTTON_HANDLER
@@ -367,6 +373,10 @@ class MainWindow:
         #Activate loading button
         self.loadDetails_btn.setEnabled(False)
         self.remove_system_btn.setEnabled(False)
+    #Open Help frame
+    def help_menu_btn_OnClick(self):
+        hw = HelpWindow() 
+        self.__secondary_windows__.append(hw)
     #close mainwindow
     def close_window_Onclik(self):
         self.frame.close()
