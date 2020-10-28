@@ -32,6 +32,9 @@ class DetailWindow:
         self.trades_default = deepcopy(_unordered_list_of_trades)
         self.trades = deepcopy(_unordered_list_of_trades)
 
+       
+
+
         self.__order_raw_trade_list__(self.trades_default)
         self.__order_raw_trade_list__(self.trades)
 
@@ -311,3 +314,12 @@ class DetailWindow:
         self.__tab_drawdownChart_loader()
         self.__tab_options_loader()
         self.__tab_optimization_loader()
+    #Dumping trade list on temp/dump.txt
+    def dump_trades(self):
+        MyFile = open("temp/dump.txt", 'w')
+        for element in self.trades:
+            for t in element:
+                MyFile.write(str(t))
+                MyFile.write(", ")
+            MyFile.write('\n')
+        MyFile.close()

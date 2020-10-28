@@ -19,13 +19,14 @@ class TradeListWindow:
         # initialize the tkinter GUI
         root = tk.Tk()
 
-        root.geometry("500x500")
+        root.geometry("700x500")
         root.pack_propagate(0)
         root.resizable(0, 0)
+        root.title('Portfolio manager for cTrader')
 
         # This is the frame for the Treeview
         frame1 = tk.LabelFrame(root, text="Portfolio Trades")
-        frame1.place(height=500, width=500)
+        frame1.place(height=500, width=700)
 
         self.tv1 = ttk.Treeview(frame1)  # This is the Treeview Widget
         tss = TradingSystemSchema()
@@ -44,7 +45,7 @@ class TradeListWindow:
         treescroll.configure(command=self.tv1.yview)  # make it vertical
         self.tv1.configure(yscrollcommand=treescroll.set)  # assign the scrollbar to the Treeview Widget
         hsb = Scrollbar(frame1, orient="horizontal", command=self.tv1.xview)
-        hsb.place(relx=0.001, rely=0.9, relheight=0.10, relwidth=0.99)
+        hsb.place(relx=0.001, rely=0.9, relheight=0.1, relwidth=0.95)
         self.tv1.configure(xscrollcommand=treescroll.set)  # assign the scrollbar to the Treeview Widget
         treescroll.pack(side="right", fill="y")  # make the scrollbar fill the yaxis of the Treeview widget
         root.mainloop()  # The mainloop for our tkinter Gui

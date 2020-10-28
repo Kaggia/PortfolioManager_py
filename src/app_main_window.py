@@ -315,12 +315,12 @@ class MainWindow:
             ts_id = len(self.current_portfolio.trading_systems) + 1
             new_ts = TradingSystem(ts_id, selected_file)
 
-            new_ts = self.format_duplicate(new_ts)
+            formatted_ts = self.format_duplicate(new_ts)
 
-            self.current_portfolio.add_system(new_ts)
-            self.current_portfolio.scalings.append(new_ts.volume) #Set the current volume in scaling list
+            self.current_portfolio.add_system(formatted_ts)
+            self.current_portfolio.scalings.append(formatted_ts.volume) #Set the current volume in scaling list
             #add to combobox
-            complete_item_name = str(str(new_ts.id) + " : " + str(new_ts.name))
+            complete_item_name = str(str(formatted_ts.id) + " : " + str(formatted_ts.name))
             self.remove_selected_item_cbox.addItem(complete_item_name)
             if (self.loadDetails_selected_item_cbox.currentText() == ""):
                 self.loadDetails_selected_item_cbox.addItem("0 : Portfolio")
@@ -333,16 +333,27 @@ class MainWindow:
             self.remove_system_btn.setEnabled(True)
     #Check duplicated names in Ts list, change ts.name and every name in ts.trade_list
     def format_duplicate(self, new_ts):
+        isDuplicate = False
         formatted_ts = deepcopy(new_ts)
         tss = TradingSystemSchema()
         label_index = tss.label_index_column
         if self.current_portfolio:
             for trading_system in self.current_portfolio.trading_systems:
-                if new_ts.name == trading_system.name:
+                if formatted_ts.name == trading_system.name:
                     #La label di due ts è uguale
-                    formatted_ts.name = str(new_ts.symbol) + "_" + str(new_ts.market) + str(random.randint(1, 99999))
-                    for trade in formatted_ts.trade_list:
-                        trade[label_index] = formatted_ts.name
+                    isDuplicate = True
+                    break
+                else:
+                    #La label di due ts è diversa
+                    isDuplicate = False    
+        #Controllo se ho trovato il duplicato
+        if isDuplicate:
+            formatted_ts.name = str(new_ts.symbol) + "_" + str(new_ts.market) + str(random.randint(1, 99999))
+            print("INFO: La label del trading system inserito è già presente nel portafogli. <", trading_system.name, ">")
+            for trade in formatted_ts.trade_list:
+                trade[label_index] = formatted_ts.name
+
+
         return formatted_ts  
     #REMOVE_SYSTEM_BUTTON_HANDLER
     def remove_system_btn_Onclick(self):
@@ -415,7 +426,10 @@ class MainWindow:
             #Load portfolio details
             print("INFO: Portfolio with ID-> " + str(ID_instr_to_load) + " will be shown in details.")
             for ts in self.current_portfolio.trading_systems:
-                for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
+                print("INFO: Trading system <", ts.name, "> will be load as portfolio component.")
+                print("INFO: Trading system <", ts.name, "> first trade is < ", ts.trade_list[0], " >")
+                #for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
+                for trade in ts.trade_list:
                     for column in trade:
                         if trade.index(column) == net_index:
                             actual_scaling = self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].volume
@@ -449,3 +463,6 @@ class MainWindow:
             #   trade[net_index] = multypling_factor * trade[net_index]
                 
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades)) 
+        
+        #for value in unordered_list_of_trades:
+            #print(value)
