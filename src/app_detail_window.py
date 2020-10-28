@@ -82,7 +82,7 @@ class DetailWindow:
         pass
     #Load Optimization tab
     def __tab_optimization_loader(self):
-        pass
+        self.tabs.setTabEnabled(self.tabs.indexOf(self.tab_optimization), False) #enable/disable the tab
     #order tradelist passed
     def __order_raw_trade_list__(self, listoftrades):
         #index_of_date = 0
@@ -274,11 +274,6 @@ class DetailWindow:
                 filtered_list_of_trades.append([index, name, symbol, volume, closing_date, float(net_cumulative), 0])
                 net_cumulative = 0
                 index += 1
-
-        #IMPLEMENT
-        for trade in filtered_list_of_trades:
-            print(trade)
-
         return filtered_list_of_trades
     #Reloading the tabs 
     def reload_tabs(self, _options):
