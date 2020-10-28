@@ -109,7 +109,7 @@ class MainWindow:
         #Label_loading_opt
         y = 175
         self.load_option_label = QtWidgets.QLabel(self.frame)
-        self.load_option_label.setGeometry(QtCore.QRect(self.spacing_left, y, 150, 31))
+        self.load_option_label.setGeometry(QtCore.QRect(self.spacing_left+2, y, 150, 31))
         self.font.setPointSize(22)
         self.load_option_label.setText("Load options:")
 
@@ -128,7 +128,7 @@ class MainWindow:
         self.remove_system_btn.setEnabled(False)
         #Combobox_REMOVE_SELECTED_ITEM
         self.remove_selected_item_cbox = QtWidgets.QComboBox(self.frame)
-        self.remove_selected_item_cbox.setGeometry(QtCore.QRect(self.spacing_left + 150, y, 150, 31))
+        self.remove_selected_item_cbox.setGeometry(QtCore.QRect(self.spacing_left + 150, y+1, 150, 29))
         #Button_CLEAR_PORTFOLIO
         y += 35
         self.clear_portfolio_btn = QtWidgets.QPushButton(self.frame)
@@ -139,7 +139,7 @@ class MainWindow:
     def __load_selecting_system__(self):
         #LABEL
         self.load_system_label = QtWidgets.QLabel(self.frame)
-        self.load_system_label.setGeometry(QtCore.QRect(self.spacing_left, 400, 150, 31))
+        self.load_system_label.setGeometry(QtCore.QRect(self.spacing_left+4, 400, 150, 31))
         self.font.setPointSize(22)
         self.load_system_label.setText("Load system or Portfolio:")
         #SELECT_SYSTEM_CBOX
@@ -147,7 +147,7 @@ class MainWindow:
         self.loadDetails_selected_item_cbox.setGeometry(QtCore.QRect(self.spacing_left + 150, 400, 150, 31))
         #Button_LOAD_DETAILS
         self.loadDetails_btn = QtWidgets.QPushButton(self.frame)
-        self.loadDetails_btn.setGeometry(QtCore.QRect(self.spacing_left +300, 400, 150, 31))
+        self.loadDetails_btn.setGeometry(QtCore.QRect(self.spacing_left +300, 399, 150, 33))
         self.font.setPointSize(22)
         self.loadDetails_btn.setText("Load details")
         self.loadDetails_btn.setEnabled(False)
