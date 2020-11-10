@@ -427,7 +427,6 @@ class MainWindow:
             print("INFO: Portfolio with ID-> " + str(ID_instr_to_load) + " will be shown in details.")
             for ts in self.current_portfolio.trading_systems:
                 print("INFO: Trading system <", ts.name, "> will be load as portfolio component.")
-                print("INFO: Trading system <", ts.name, "> first trade is < ", ts.trade_list[0], " >")
                 #for trade in self.current_portfolio.trading_systems[int(ID_instr_to_load)-1].trade_list:
                 for trade in ts.trade_list:
                     for column in trade:
@@ -442,6 +441,7 @@ class MainWindow:
                             mod_trade.append(column)
                     unordered_list_of_trades.append(mod_trade)    
                     mod_trade = []
+            print("INFO: Portfolio scalings: ", self.current_portfolio.scalings)
             self.__secondary_windows__.append(DetailWindow(unordered_list_of_trades))
         else:
             #Load System by ID

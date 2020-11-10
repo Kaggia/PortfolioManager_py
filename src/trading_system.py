@@ -138,6 +138,7 @@ class TradingSystem:
                 print(PRINT_ERROR)
                 isInt = False    
         if isInt and market_found == 'f': 
+            print("INFO: System <", self.name, "> is a Forex.")
             clean_volume = first_raw_volume[first_raw_volume.rfind(" ")+1:]
             if clean_volume[-1] == 'k':
                 value_volume = float(clean_volume [:-1]) / 100
@@ -147,11 +148,13 @@ class TradingSystem:
                 value_volume = float(clean_volume [:-1]) * 10
                 print(PRINT_INFO_2 + str(value_volume))
         elif isInt and market_found == 'i':  
+            print("INFO: System <", self.name, "> is an index.")
             clean_volume = first_raw_volume[:first_raw_volume.find(" ")]
-            value_volume = float(clean_volume)
-            print(PRINT_INFO_2 + str(value_volume))
+            value_volume = float(clean_volume)/100
+            print(PRINT_INFO_2 + str(value_volume)) 
         elif isInt and market_found == 'c':
-            value_volume = float(first_raw_volume[:first_raw_volume.find(" ")])
+            print("INFO: System <", self.name, "> is a commodity.")
+            value_volume = float(first_raw_volume[:first_raw_volume.find(" ")]) / 100
             print(PRINT_INFO_2 + str(value_volume))
         return value_volume
     #Print trades on console
